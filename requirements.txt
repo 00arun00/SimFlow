@@ -1,3 +1,4 @@
 numpy
 os
 wget
+pytest
