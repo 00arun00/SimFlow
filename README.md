@@ -46,6 +46,7 @@ pip install -r requirements.txt
 ### Sample network/ How to use
 
 ```python
+import simflow as sf
 Data,Labels = sf.data_loader_mnist.load_normalized_mnist_data_flat()
 
 inp_dim = 784
@@ -71,10 +72,10 @@ net.set_iterator(sf.iterators.minibatch_iterator())
 net.fit(Data['train'],Labels['train'],epochs=5)
 
 # pring scores after training
-    print("Final Accuracies after training :")
-    print("Train Accuracy: ",net.score(Data['train'],Labels['train'])[1],end=" ")
-    print("validation Accuracy: ",net.score(Data['val'],Labels['val'])[1],end =' ')
-    print("Test Accuracy: ",net.score(Data['test'],Labels['test'])[1])
+print("Final Accuracies after training :")
+print("Train Accuracy: ",net.score(Data['train'],Labels['train'])[1],end=" ")
+print("validation Accuracy: ",net.score(Data['val'],Labels['val'])[1],end =' ')
+print("Test Accuracy: ",net.score(Data['test'],Labels['test'])[1])
 
 ```
 
