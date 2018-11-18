@@ -16,3 +16,12 @@ Optimizers:
   - SGD
   - Momentum
   - Nestrov Momentum
+
+Iterators:
+  - Full batch
+  - Mini batch
+  - Stochastic
+  
+Data Loaders:
+  - MNIST
+
