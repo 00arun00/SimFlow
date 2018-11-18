@@ -1,2 +1,2 @@
 # SimFlow
-Ultra portable deep learning farmework in Numpy
+Ultra portable deep learning framework in Numpy
