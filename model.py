@@ -71,4 +71,4 @@ class Model(object):
             var, grad = var_grad
             var -= self.lr * grad
         
-return loss
+        return loss
