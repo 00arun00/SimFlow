@@ -99,3 +99,20 @@ class Dense(Layer):
           return dX, [(self.W, dW), (self.b, db)]
         else:
           return dX, []
+
+class ReLU(Layer):
+  
+    def __init__(self,*,trainable):
+      self.cache_in = None
+      self.trainable = trainable
+    
+    def forward(self, X, train=True):
+        out = np.maximum(X,0)
+        if train:
+            self.cache_in = X
+        return out
+
+    def backward(self, dY):
+        if self.cache_in is None:
+          raise RuntimeError('Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
+        return dY*(self.cache_in>=0) 
