@@ -8,9 +8,43 @@ def load_normalized_mnist_data_flat():
     Returns two dictionaries, input and labels
     Each has keys 'train', 'val', 'test' which map to numpy arrays
     '''
-    print('loading data please wait will take around a minute')
-    data = np.loadtxt('data/mnist_train.csv', dtype=int, delimiter=',')
-    test_data = np.loadtxt('data/mnist_test.csv', dtype=int, delimiter=',')
+    try:
+        print('loading data please wait will take around a minute')
+        data = np.loadtxt('data/mnist_train.csv', dtype=int, delimiter=',')
+    except:
+        import os
+        import wget
+        url = 'https://pjreddie.com/media/files/mnist_train.csv'
+        print('File now found downloading from online source')
+        print('Downloading data will take some time')
+        try:
+            os.mkdir('data')
+        except:
+            pass
+        wget.download(url,'data/mnist_train.csv')
+        print('Now loading data please wait will take around a minute')
+
+        data = np.loadtxt('data/mnist_train.csv', dtype=int, delimiter=',')
+
+    try:
+        print('loading data please wait will take around a minute')
+        test_data = np.loadtxt('data/mnist_test.csv', dtype=int, delimiter=',')
+    except:
+        import os
+        import wget
+        url = 'https://pjreddie.com/media/files/mnist_test.csv'
+        print('File now found downloading from online source')
+        print('Downloading data will take some time')
+        try:
+            os.mkdir('data')
+        except:
+            pass
+        wget.download(url,'data/mnist_test.csv')
+        print('Now loading data please wait will take around a minute')
+
+        test_data = np.loadtxt('data/mnist_test.csv', dtype=int, delimiter=',')
+
+
 
     inputs = dict()
     labels = dict()

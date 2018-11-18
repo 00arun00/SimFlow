@@ -38,7 +38,7 @@ class fullbatch_iterator(Iterator):
         self.shuffle = shuffle
         self.method = 'full batch'
 
-class storchastic_iterator(Iterator):
+class stochastic_iterator(Iterator):
     def __init__(self,*,shuffle=True):
         self.batch_size=1
         self.method = 'stochastic'
