@@ -101,11 +101,11 @@ class Dense(Layer):
           return dX, []
 
 class ReLU(Layer):
-  
+
     def __init__(self,*,trainable):
       self.cache_in = None
       self.trainable = trainable
-    
+
     def forward(self, X, train=True):
         out = np.maximum(X,0)
         if train:
@@ -115,15 +115,15 @@ class ReLU(Layer):
     def backward(self, dY):
         if self.cache_in is None:
           raise RuntimeError('Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
-        return dY*(self.cache_in>=0) 
-    
-    
+        return dY*(self.cache_in>=0) ,[]
+
+
 class sigmoid(Layer):
-  
+
     def __init__(self,*,trainable):
       self.cache_in = None
       self.trainable = trainable
-    
+
     def forward(self, X, train=True):
         out = 1/(1+np.exp(-X))
         if train:
@@ -134,14 +134,14 @@ class sigmoid(Layer):
         if self.cache_in is None:
           raise RuntimeError('Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
         out = self.cache_in
-        return dY*(out*(1-out)) 
-    
+        return dY*(out*(1-out)) ,[]
+
 class tanh(Layer):
-  
+
     def __init__(self,*,trainable):
       self.cache_in = None
       self.trainable = trainable
-    
+
     def forward(self, X, train=True):
         out = np.tanh(X)
         if train:
@@ -152,5 +152,4 @@ class tanh(Layer):
         if self.cache_in is None:
           raise RuntimeError('Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
         out = self.cache_in
-        return dY*(1-out**2) 
-    
+        return dY*(1-out**2) ,[]
