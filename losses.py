@@ -33,4 +33,4 @@ class SoftmaxCrossEntropyLoss(Loss):
         one_hot[np.arange(len(labels)), labels] = 1.0
         grad = (scores_norm - one_hot) / len(labels)
 
-return loss, grad
+        return loss, grad

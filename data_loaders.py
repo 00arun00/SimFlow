@@ -1,0 +1,1 @@
+from data_loader_mnist import load_normalized_mnist_data_flat,load_normalized_mnist_data_conv

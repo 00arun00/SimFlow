@@ -102,7 +102,7 @@ class Dense(Layer):
 
 class ReLU(Layer):
 
-    def __init__(self,*,trainable):
+    def __init__(self,*,trainable=True):
       self.cache_in = None
       self.trainable = trainable
 
@@ -120,7 +120,7 @@ class ReLU(Layer):
 
 class sigmoid(Layer):
 
-    def __init__(self,*,trainable):
+    def __init__(self,*,trainable=True):
       self.cache_in = None
       self.trainable = trainable
 
@@ -138,7 +138,7 @@ class sigmoid(Layer):
 
 class tanh(Layer):
 
-    def __init__(self,*,trainable):
+    def __init__(self,*,trainable=True):
       self.cache_in = None
       self.trainable = trainable
 

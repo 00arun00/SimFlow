@@ -1,3 +1,4 @@
+import numpy as np
 def load_normalized_mnist_data_flat():
     '''
     Loads and normalizes the MNIST data. Reads the data from
@@ -7,6 +8,7 @@ def load_normalized_mnist_data_flat():
     Returns two dictionaries, input and labels
     Each has keys 'train', 'val', 'test' which map to numpy arrays
     '''
+    print('loading data please wait will take around a minute')
     data = np.loadtxt('data/mnist_train.csv', dtype=int, delimiter=',')
     test_data = np.loadtxt('data/mnist_test.csv', dtype=int, delimiter=',')
 
@@ -31,7 +33,7 @@ def load_normalized_mnist_data_flat():
     labels['train'] = train_data[:, 0]
     labels['val'] = val_data[:, 0]
     labels['test'] = test_data[:, 0]
-
+    print('Data loading completed')
     return inputs, labels
 
 def load_normalized_mnist_data_conv():
@@ -43,6 +45,7 @@ def load_normalized_mnist_data_conv():
     Returns two dictionaries, input and labels
     Each has keys 'train', 'val', 'test' which map to numpy arrays
     '''
+    print('loading data please wait will take around a minute')
     data = np.loadtxt('data/mnist_train.csv', dtype=int, delimiter=',')
     test_data = np.loadtxt('data/mnist_test.csv', dtype=int, delimiter=',')
     inputs = dict()
@@ -66,5 +69,5 @@ def load_normalized_mnist_data_conv():
     labels['train'] = train_data[:, 0]
     labels['val'] = val_data[:, 0]
     labels['test'] = test_data[:, 0]
-
+    print('Data Loading completed')
     return inputs, labels
