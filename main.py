@@ -11,6 +11,7 @@ def main():
     net = sf.Model()
     net.add_layer(sf.layers.Dense(inp_dim,200))
     net.add_layer(sf.layers.ReLU())
+    net.add_layer(sf.layers.BN_mean(200))
     net.add_layer(sf.layers.Dense(200,num_classes))
 
     #add loss function

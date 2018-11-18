@@ -153,3 +153,43 @@ class tanh(Layer):
           raise RuntimeError('Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
         out = self.cache_in
         return dY*(1-out**2) ,[]
+
+class BN_mean(Layer):
+    '''
+    Represents a mean only Batch normalization  Layer (BN)
+        During Train
+        BN(x) = X - mean(X_batch) + beta
+
+        During Test
+        BN(x) = X - Learned_mean + beta
+    '''
+    def __init__(self,dim,*,exponential_learning_rate=0.9,trainable=True):
+        self.beta = np.zeros((1,int(np.prod(dim))))
+        self.cache_in = None
+        self.mean_learned = np.zeros_like(self.beta)
+        self.elr = exponential_learning_rate
+    def forward(self, X, train=True):
+
+        if train:
+            current_mean = np.mean(X,axis=0,keepdims=True)
+            out = X - current_mean + self.beta
+
+            self.cache_in = X
+            #update for mean_learned (exponential moving average no bias currection since we are going to be trainig it sufficiently)
+            self.mean_learned = (self.elr*self.mean_learned) + (current_mean*(1-self.elr))
+
+        else: #during test use mean_learned
+            current_mean = np.mean(X,axis=0,keepdims=True)
+            out = X - self.mean_learned + self.beta
+        return out
+
+    def backward(self, dY):
+        if self.cache_in is None:
+            raise RuntimeError('Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
+        dbeta = np.sum(dY, axis=0, keepdims=True)
+        N,D = dY.shape
+        # for mean step
+        dx1 = dY
+        dx2 = np.ones((N,D))/N * -1 * np.sum(dY, axis=0)
+        dX = dx1 + dx2
+        return dX, [(self.beta, dbeta)]
