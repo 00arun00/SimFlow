@@ -33,14 +33,11 @@ Ultra portable Deep Learning framework in Numpy
 
 
 
-### Installation steps:
+### Installation steps
 
 ```
 pip install -r requirements.txt
 ```
-
-
-
 
 
 ### Sample network/ How to use
@@ -79,7 +76,7 @@ print("Test Accuracy: ",net.score(Data['test'],Labels['test'])[1])
 
 ```
 
-### Features currently worked on:
+### Features currently worked on
 
 #### Layers:
 
@@ -118,4 +115,3 @@ currently supports
 
 - Dense Layer
 - BN_mean Layer
-
