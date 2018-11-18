@@ -117,8 +117,6 @@ class ReLU(Layer):
           raise RuntimeError('Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
         return dY*(self.cache_in>=0) 
     
-    return([])
-
     
 class sigmoid(Layer):
   
@@ -137,8 +135,6 @@ class sigmoid(Layer):
           raise RuntimeError('Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
         out = self.cache_in
         return dY*(out*(1-out)) 
-
-    return([])
     
 class tanh(Layer):
   
@@ -158,4 +154,3 @@ class tanh(Layer):
         out = self.cache_in
         return dY*(1-out**2) 
     
-    return([])
