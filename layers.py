@@ -193,3 +193,21 @@ class BN_mean(Layer):
         dx2 = np.ones((N,D))/N * -1 * np.sum(dY, axis=0)
         dX = dx1 + dx2
         return dX, [(self.beta, dbeta)]
+
+
+class Flatten(Layer):
+    '''
+    Represents a flatten layer
+    takes a tensor and converts it to a matrix
+    '''
+    def __init__(self):
+        self.cache_in = None
+
+    def forward(self, X, train=True):
+        self.shape = X.shape
+        out = X.reshape(self.shape[0],-1)
+        return out
+
+    def backward(self, dY):
+        dX = dY.reshape(self.shape)
+        return dX,[]
