@@ -168,31 +168,34 @@ class BN_mean(Layer):
         self.cache_in = None
         self.mean_learned = np.zeros_like(self.beta)
         self.elr = exponential_learning_rate
+        self.trainable=trainable
     def forward(self, X, train=True):
-
+        X_shape = X.shape
+        X_flat = X.reshape(X_shape[0],-1)
         if train:
-            current_mean = np.mean(X,axis=0,keepdims=True)
-            out = X - current_mean + self.beta
+            current_mean = np.mean(X_flat,axis=0,keepdims=True)
+            out_flat = X_flat - current_mean + self.beta
 
-            self.cache_in = X
             #update for mean_learned (exponential moving average no bias currection since we are going to be trainig it sufficiently)
             self.mean_learned = (self.elr*self.mean_learned) + (current_mean*(1-self.elr))
 
         else: #during test use mean_learned
-            current_mean = np.mean(X,axis=0,keepdims=True)
-            out = X - self.mean_learned + self.beta
-        return out
+            out_flat = X_flat - self.mean_learned + self.beta
+        return out_flat.reshape(X_shape)
 
     def backward(self, dY):
-        if self.cache_in is None:
-            raise RuntimeError('Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
-        dbeta = np.sum(dY, axis=0, keepdims=True)
-        N,D = dY.shape
-        # for mean step
-        dx1 = dY
-        dx2 = np.ones((N,D))/N * -1 * np.sum(dY, axis=0)
-        dX = dx1 + dx2
-        return dX, [(self.beta, dbeta)]
+        dY_shape = dY.shape
+        dY_flat = dY.reshape(dY_shape[0],-1)
+        N,D = dY_flat.shape
+        dx1 = dY_flat
+        dx2 = np.ones((N,D))/N * -1 * np.sum(dY_flat, axis=0)
+        dX_flat = dx1 + dx2
+        dX = dX_flat.reshape(dY_shape)
+        if self.trainable:
+            dbeta = np.sum(dY_flat, axis=0, keepdims=True)
+            return dX, [(self.beta, dbeta)]
+        else:
+            return dX,[]
 
 
 class Flatten(Layer):
