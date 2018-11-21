@@ -1,5 +1,5 @@
 import numpy as np
-
+from im2col import *
 class Layer(object):
     '''
     Abstract class representing a neural network layer
@@ -280,3 +280,73 @@ class Flatten(Layer):
     def backward(self, dY):
         dX = dY.reshape(self.shape)
         return dX,[]
+
+class Conv(Layer):
+    def __init__(self,outChannels,inChannels,filter_size,stride=1,padding=0,*,trainable=False):
+        '''
+        Represents a Convolutional layer
+        '''
+        self.cache_in = None
+        W_size = (outChannels,inChannels,filter_size,filter_size) #currently supports only square kernels
+        self.W = np.random.rand(*W_size)/filter_size #xavier initialization
+        self.b = np.zeros((outChannels,1))
+        self.stride = stride
+        self.padding = padding
+        self.trainable = trainable
+
+    @staticmethod
+    def _convolve_(Input,kernel,bias=0,padding=0,stride=1):
+        assert len(Input.shape)==4 and len(kernel.shape)==4
+        n_x, d_x, h_x, w_x = Input.shape
+        n_filter, d_filter, h_filter, w_filter = kernel.shape
+        assert d_x == d_filter,"inputs not alligned for standard convolution"
+
+        #check for validity of convolution
+        h_out = (h_x - h_filter + 2 * padding) / stride + 1
+        w_out = (w_x - w_filter + 2 * padding) / stride + 1
+
+        if not h_out.is_integer() or not w_out.is_integer():
+            raise Exception('Invalid output dimension!')
+
+        h_out, w_out = int(h_out), int(w_out)
+
+        Input_col = im2col_indices(Input, h_filter, w_filter, padding=padding, stride=stride)
+        kernel_row = kernel.reshape(n_filter, -1)
+        out = kernel_row @ Input_col + bias
+        out = out.reshape(n_filter, h_out, w_out, n_x)
+        out = out.transpose(3, 0, 1, 2)
+        return out,Input_col
+
+
+    def forward(self, X, train=True):
+        output,X_col = self._convolve_(Input = X,kernel = self.W,bias = self.b,padding = self.padding, stride = self.stride)
+        if train:
+            self.cache_in = (X,X_col)
+        return output
+
+    def backward(self, dY):
+        if self.cache_in is None:
+            raise RuntimeError('Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
+        X,X_col = self.cache_in
+        n_filter, d_filter, h_filter, w_filter = self.W.shape
+
+        dY_reshaped = dY.transpose(1, 2, 3, 0).reshape(n_filter, -1)
+
+        W_reshape = self.W.reshape(n_filter, -1)
+        dX_col = W_reshape.T @ dY_reshaped
+        dX = col2im_indices(dX_col, X.shape, h_filter, w_filter, padding=self.padding, stride=self.stride)
+        assert X.shape == dX.shape,'shape missmatch'
+        if self.trainable:
+
+            db = np.sum(dY, axis=(0, 2, 3)).reshape(n_filter, -1)
+
+            dW = dY_reshaped @ X_col.T
+            dW = dW.reshape(self.W.shape)
+
+
+            assert self.W.shape == dW.shape,'shape missmatch'
+            assert self.b.shape == db.shape,'shape missmatch'
+
+            return dX, [(self.W,dW),(self.b,db)]
+        else:
+            return dX,[]
