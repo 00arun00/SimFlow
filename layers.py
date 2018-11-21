@@ -197,6 +197,72 @@ class BN_mean(Layer):
         else:
             return dX,[]
 
+class BN(Layer):
+    '''
+    Represents a Batch normalization  Layer (BN)
+        During Train
+        BN(x) = gamma(X - mean(X_batch))/std(X_batch) + beta
+
+        During Test
+        BN(x) = gamma((X - Learned_mean)/Learned_std) + beta
+
+    '''
+    def __init__(self,dim,*,exponential_learning_rate=0.9,trainable=True,eps=1e-10):
+        self.beta = np.zeros((1,int(np.prod(dim))))
+        self.gamma = np.zeros((1,int(np.prod(dim))))
+        self.cache_in = None
+        self.mean_learned = np.zeros_like(self.beta)
+        self.var_learned = np.zeros_like(self.gamma)
+        self.elr = exponential_learning_rate
+        self.trainable=trainable
+        self.eps=eps
+
+    def forward(self, X, train=True):
+        X_shape = X.shape
+        X_flat = X.reshape(X_shape[0],-1)
+        if train:
+            assert X_shape[0]>1,"Batch_norm layer is not supported in training mode"
+            current_mean = np.mean(X_flat,axis=0)
+            current_var = np.var(X_flat,axis=0)
+            X_norm_flat = (X_flat - current_mean)/np.sqrt(current_var+self.eps)
+            out_flat = self.gamma*X_norm_flat + self.beta
+
+            #update for mean_learned and std_learned (exponential moving average no bias currection since we are going to be trainig it sufficiently)
+            self.mean_learned = (self.elr*self.mean_learned) + (current_mean*(1-self.elr))
+            self.var_learned = (self.elr*self.var_learned) + (current_var*(1-self.elr))
+
+            self.cache_in=(X_flat,current_mean,current_var,X_norm_flat)
+
+        else: #during test use mean_learned adn std_learned
+            X_norm_flat =(X_flat - self.mean_learned)/np.sqrt(self.var_learned+self.eps)
+            out_flat =self.gamma*X_norm_flat  + self.beta
+        return out_flat.reshape(X_shape)
+
+    def backward(self, dY):
+        if self.cache_in is None:
+          raise RuntimeError('Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
+        X_flat,current_mean,current_var,X_norm_flat = self.cache_in
+        dY_shape = dY.shape
+        #fatten dY
+        dY_flat = dY.reshape(dY_shape[0],-1)
+        N= dY_shape[0]
+        X_mu = X_flat - current_mean
+        inv_var = 1/np.sqrt(current_var+self.eps)
+
+        dX_norm = dY_flat * self.gamma
+
+        d_var = np.sum(dX_norm*X_mu,axis=0)*(-((current_var+self.eps)**(-3/2))/2)
+
+        d_mu = np.sum(dX_norm*(-inv_var),axis=0) + (1/N)*d_var*np.sum(-2*X_mu,axis=0)
+
+        dX_flat = (dX_norm*inv_var)+(d_mu+2*d_var*X_mu)/N
+        dX = dX_flat.reshape(dY_shape)
+        if self.trainable:
+          dbeta = np.sum(dY_flat, axis=0, keepdims=True)
+          dgamma = np.sum(dY_flat*X_norm_flat,axis=0,keepdims=True)
+          return dX, [(self.gamma,dgamma),(self.beta, dbeta)]
+        else:
+            return dX,[]
 
 class Flatten(Layer):
     '''
