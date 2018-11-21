@@ -350,3 +350,58 @@ class Conv(Layer):
             return dX, [(self.W,dW),(self.b,db)]
         else:
             return dX,[]
+
+class dilated_Conv(Conv):
+
+    def __init__(self,outChannels,inChannels,filter_size,dilation=2,stride=1,padding=0,*,trainable=False):
+        '''
+        Represents a Dialated Convolutional layer
+        '''
+        super(dilated_Conv,self).__init__(outChannels=outChannels,inChannels=inChannels,filter_size=filter_size,stride=stride,padding=padding,trainable=trainable)
+        self.dilation = dilation #currently supports only symmetical dilations
+        self.dm = self._create_dilation_mat_()
+
+    def _create_dilation_mat_(self):
+        I = np.eye(self.W.shape[2])
+        z = np.zeros((1,self.W.shape[2]))
+        res =[]
+        for i in range(self.W.shape[2]):
+            res.append(I[i])
+            for k in range(self.dilation-1):
+                res.append(z)
+        res = np.row_stack(res)
+        return res[:-self.dilation+1]
+
+    def forward(self, X, train=True):
+        self.W_exp = self.dm@self.W@self.dm.T
+        output,_ = self._convolve_(Input=X,kernel=self.W_exp,bias=self.b,padding= self.padding,stride = self.stride)
+        if train:
+            self.cache_in = X
+        return output
+
+    def backward(self, dY):
+        if self.cache_in is None:
+            raise RuntimeError('Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
+        X = self.cache_in
+
+        n_filter, d_filter, h_filter, w_filter = self.W.shape
+
+        exchange_mat= np.rot90(np.eye(h_filter))
+        reversed_w = exchange_mat@self.W@exchange_mat.T
+        dialated_reversed_w = self.dm@ reversed_w @self.dm.T
+
+        dX,_ = self._convolve_(Input=dY,kernel=dialated_reversed_w.transpose(1,0,2,3),padding=dialated_reversed_w.shape[2]-1)
+        assert X.shape == dX.shape
+
+        if self.trainable:
+
+            db = np.sum(dY, axis=(0, 2, 3)).reshape(n_filter, -1)
+            dW,_ = self._convolve_(Input=X.transpose(1,0,2,3),kernel=dY.transpose(1,0,2,3),stride=self.dilation,padding=0)
+            dW = dW.transpose(1,0,2,3)
+
+
+            assert self.W.shape == dW.shape
+            assert self.b.shape == db.shape
+            return dX, [(self.W,dW),(self.b,db)]
+        else:
+            return dX,[]
