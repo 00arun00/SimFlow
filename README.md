@@ -10,7 +10,10 @@ Ultra portable Deep Learning framework in Numpy
   - Sigmoid
   - Tanh
   - BN_mean (mean only batch norm)
-
+  - Batch Normalization
+  - Convolutional Neural nets
+  - Dilated Convolutional Layer
+  
 #### Losses:
 
   - SoftmaxCrossEntropyLoss
@@ -80,15 +83,10 @@ print("Test Accuracy: ",net.score(Data['test'],Labels['test'])[1])
 
 #### Layers:
 
-- Convolutional Neural nets
-- Dilated Convolutional Layer
-- Batch Normalization
 - dropout
 - maxpool / average pool
 - LeakyReLU
 - PReLU
-
-
 
 #### Regularizers:
 
@@ -100,8 +98,6 @@ print("Test Accuracy: ",net.score(Data['test'],Labels['test'])[1])
 
 - Adam
 - RMSprop
-
-
 
 ### Testing Features
 
@@ -115,3 +111,6 @@ currently supports
 
 - Dense Layer
 - BN_mean Layer
+- BN layer
+- Conv Layer
+- dilatedConv Layer
