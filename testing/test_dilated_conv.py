@@ -1,5 +1,5 @@
 import numpy as np
-from layers import dilated_Conv
+from layers import dilated_Conv2D
 from grad_check_utils import numerical_gradient_array
 from im2col import im2col_indices
 
@@ -24,7 +24,7 @@ def test_dilated_conv_layer_back_prop():
     b = np.random.randn(n_filter,1)
     dout = np.random.randn(batch_size, n_filter, h_out, w_out)
 
-    dc_layer = dilated_Conv(inChannels=inChannels,outChannels=n_filter,filter_size=filter_size,stride=stride,padding=padding,trainable=True)
+    dc_layer = dilated_Conv2D(inChannels=inChannels,outChannels=n_filter,filter_size=filter_size,stride=stride,padding=padding,trainable=True)
     dc_layer.W = w
     dc_layer.b = b
 

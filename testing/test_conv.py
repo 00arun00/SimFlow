@@ -1,5 +1,5 @@
 import numpy as np
-from layers import Conv
+from layers import Conv2D
 from grad_check_utils import numerical_gradient_array
 from im2col import im2col_indices
 
@@ -35,7 +35,7 @@ def test_conv_layer_forward_prop():
     b = np.random.randn(n_filter,1)
     dout = np.random.randn(batch_size, n_filter, h_out, w_out)
 
-    c_layer = Conv(inChannels=inChannels,outChannels=n_filter,filter_size=filter_size,stride=stride,padding=padding,trainable=True)
+    c_layer = Conv2D(inChannels=inChannels,outChannels=n_filter,filter_size=filter_size,stride=stride,padding=padding,trainable=True)
     c_layer.W = w
     c_layer.b = b
 
@@ -69,7 +69,7 @@ def test_conv_layer_back_prop():
     b = np.random.randn(n_filter,1)
     dout = np.random.randn(batch_size, n_filter, h_out, w_out)
 
-    c_layer = Conv(inChannels=inChannels,outChannels=n_filter,filter_size=filter_size,stride=stride,padding=padding,trainable=True)
+    c_layer = Conv2D(inChannels=inChannels,outChannels=n_filter,filter_size=filter_size,stride=stride,padding=padding,trainable=True)
     c_layer.W = w
     c_layer.b = b
 

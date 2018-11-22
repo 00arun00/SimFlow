@@ -4,7 +4,9 @@ def load_normalized_mnist_data_flat():
     Loads and normalizes the MNIST data. Reads the data from
         data/mnist_train.csv
         data/mnist_test.csv
-    These can be downloaded from https://pjreddie.com/projects/mnist-in-csv/
+    If these are not present they are downloaded and saved from
+    https://pjreddie.com/projects/mnist-in-csv/
+
     Returns two dictionaries, input and labels
     Each has keys 'train', 'val', 'test' which map to numpy arrays
     '''
@@ -75,7 +77,9 @@ def load_normalized_mnist_data_conv():
     Loads and normalizes the MNIST data. Reads the data from
         data/mnist_train.csv
         data/mnist_test.csv
-    These can be downloaded from https://pjreddie.com/projects/mnist-in-csv/
+    If these are not present they are downloaded and saved from
+    https://pjreddie.com/projects/mnist-in-csv/
+
     Returns two dictionaries, input and labels
     Each has keys 'train', 'val', 'test' which map to numpy arrays
     '''

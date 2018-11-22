@@ -31,15 +31,16 @@ class Layer(object):
         '''
         raise NotImplementedError('This is an abstract class')
 
-    def _initializer_(self,W):
+    def _initializer_(self,W,init_method):
         """
         Initializes the parameter passes as argument using Xavier of He initialization
 
         Args:
-            W (numpy.ndarray): Parameter to be initialized
+            W (numpy.ndarray) : Parameter to be initialized
+            init_method (str) : Method to initialize the parameter
 
         """
-        if self.init_method == 'Xavier':
+        if init_method == 'Xavier':
             if len(W.shape)==2: #linear layer
               input_dim,output_dim = W.shape
               return np.sqrt(2.0/(input_dim+output_dim))
@@ -48,7 +49,7 @@ class Layer(object):
               return np.sqrt(2.0/(h_filter*w_filter*d_filter))
             else:
               raise NotImplementedError('This W size is not defined')
-        elif self.init_method == 'He':
+        elif init_method == 'He':
             if len(W.shape)==2: #linear layer
               input_dim,output_dim = W.shape
               return np.sqrt(2.0/(input_dim))
@@ -90,7 +91,7 @@ class Dense(Layer):
         '''
         self.init_method = init_method
         self.W = np.random.randn(input_dim, output_dim)
-        self.W *= self._initializer_(self.W)
+        self.W *= self._initializer_(self.W,init_method)
         self.b = np.zeros((1, output_dim))
         self.cache_in = None
         self.trainable = trainable
@@ -140,8 +141,10 @@ class Dense(Layer):
             return dX, [(self.W, dW), (self.b, db)]
         else:
             return dX, []
+
     def __repr__(self):
         return f'Dense Layer with shape {self.W.shape}'
+
 #adding aliases
 Linear = Dense
 
@@ -350,7 +353,6 @@ class BN_mean(Layer):
 
         Args:
             dY (numpy.ndarray)  : Output gradient backpropagated from layers in the front
-                                  shape of dY is (batch_size x output_dim)
 
         Returns:
             dX (numpy.ndarray)  : Input gradient after backpropagating dY through BN_mean layer
@@ -379,7 +381,7 @@ class BN(Layer):
         BN(x) = gamma((X - Learned_mean)/Learned_std) + beta
 
     '''
-    def __init__(self,dim,*,exponential_learning_rate=0.9,trainable=True):
+    def __init__(self,dim,*,elr=0.9,trainable=True):
         '''
         Initializes the BN layer parameter
             beta is initialized to zeros
@@ -400,7 +402,7 @@ class BN(Layer):
         self.cache_in = None
         self.mean_learned = np.zeros_like(self.beta)
         self.var_learned = np.zeros_like(self.gamma)
-        self.elr = exponential_learning_rate
+        self.elr = elr
         self.trainable=trainable
         self.l_name = 'Batchnorm'
         self.eps=1e-10 #to avoid division_by_zero error if var = 0
@@ -442,7 +444,6 @@ class BN(Layer):
 
         Args:
             dY (numpy.ndarray)  : Output gradient backpropagated from layers in the front
-                                  shape of dY is (batch_size x output_dim)
 
         Returns:
             dX (numpy.ndarray)  : Input gradient after backpropagating dY through BN_mean layer
@@ -507,31 +508,71 @@ class Flatten(Layer):
         Performs a backward pass through the BN_mean Layer
 
         Args:
-            dY (numpy.ndarray)  : Output gradient backpropagated from layers in the front
-                                  shape of dY is (batch_size x output_dim)
+            dY (numpy.ndarray)   : Output gradient backpropagated from layers in the front
 
         Returns:
-            dX (numpy.ndarray)  : Input gradient after reshaping dY
-            var_grad_list (list): [], since layer is not trainable
+            dX (numpy.ndarray)   : Input gradient after reshaping dY
+            var_grad_list (list) : [], since layer is not trainable
         '''
         dX = dY.reshape(self.shape)
         return dX,[]
 
-class Conv(Layer):
-    def __init__(self,outChannels,inChannels,filter_size,stride=1,padding=0,*,trainable=False):
+class Conv2D(Layer):
+    '''
+    Represents a 2D Convolutional Layer
+    '''
+    def __init__(self,outChannels,inChannels,filter_size,stride=1,padding=0,*,init_method='Xavier',trainable=False):
         '''
-        Represents a Convolutional layer
+        Initializes the Convolutional layer
+            W is initialized with either Xavier or He initialization
+            b is initialized to zero
+
+        Args:
+            outChannels (int)   :   Number of output channels
+            inChannels (int)    :   size of output requred
+            filter_size (int)   :   Size of each kernel (filter_size x filter_size)
+            stride (int)        :   Stride to be used
+            padding (int)       :   Padding to be used for convolution
+            init_method (str)   :   initialization method to be used for Weights
+            trainable (bool)    :   if set to False parameters of the layer are frozed
+                                    if set to True parameters are updated during optimizer step
         '''
+        assert isinstance(outChannels,int) and outChannels > 0
+        assert isinstance(inChannels,int) and inChannels > 0
+        assert isinstance(filter_size,int) and filter_size > 0
+        assert isinstance(stride,int) and stride > 0
+        assert isinstance(padding,int) and padding >= 0
+
         self.cache_in = None
         W_size = (outChannels,inChannels,filter_size,filter_size) #currently supports only square kernels
-        self.W = np.random.rand(*W_size)/filter_size #xavier initialization
+        self.W = np.random.rand(*W_size)
+        self.W *= self._initializer_(self.W,init_method)
         self.b = np.zeros((outChannels,1))
         self.stride = stride
         self.padding = padding
         self.trainable = trainable
+        self.l_name = 'Conv2D'
+
+    def __repr__(self):
+        return f'Conv2D Layer with {self.W.shape[0]} number of filters of shape {self.W.Shape[1:]}, Stide = {self.stride}, padding = {self.padding} Trainable = {self.trainable}'
 
     @staticmethod
     def _convolve_(Input,kernel,bias=0,padding=0,stride=1):
+        '''
+        2D Convolution function:
+        Convolves Inputs with the given kernel
+
+        Args:
+            Input (numpy.ndarray)     :    Input to be Convolved over
+            kernel (numpy.ndarray)    :    Kernel to be Convoled with
+            bias (numpy.ndarray)      :    bias optional, set to zero unless needed
+            padding (int)             :    padding to be used
+            stride (int)              :    stride to used
+
+        Returns:
+            out (numpy.ndarray)       :    Output after convolution
+            Input_col (numpy.ndarray) :    retiled and stacked input
+        '''
         assert len(Input.shape)==4 and len(kernel.shape)==4
         n_x, d_x, h_x, w_x = Input.shape
         n_filter, d_filter, h_filter, w_filter = kernel.shape
@@ -555,12 +596,33 @@ class Conv(Layer):
 
 
     def forward(self, X, train=True):
+        '''
+        Performs a forward pass through the 2D Convolution layer:
+        Convolves Inputs with the Weights
+
+        Args:
+            X (numpy.ndarray)   : Input array
+            train (bool)        : Set true to cache X and X_col
+
+        Returns:
+            Out (numpy.ndarray) : Output after Convolution
+        '''
         output,X_col = self._convolve_(Input = X,kernel = self.W,bias = self.b,padding = self.padding, stride = self.stride)
         if train:
             self.cache_in = (X,X_col)
         return output
 
     def backward(self, dY):
+        '''
+        Performs a backward pass through the Conv2D Layer
+
+        Args:
+            dY (numpy.ndarray)  : Output gradient backpropagated from layers in the front
+
+        Returns:
+            dX (numpy.ndarray)  : Input gradient after backpropagating dY through Conv2D
+            var_grad_list (list): If Layer is trainable contains (W,dW) and (b,db) otherwise []
+        '''
         if self.cache_in is None:
             raise RuntimeError('Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
         X,X_col = self.cache_in
@@ -587,17 +649,41 @@ class Conv(Layer):
         else:
             return dX,[]
 
-class dilated_Conv(Conv):
+class dilated_Conv2D(Conv2D):
+    '''
+    Represents a 2D Dilated Convolutional Layer
+    '''
+    def __init__(self,outChannels,inChannels,filter_size,dilation=2,stride=1,padding=0,*,init_method='Xavier',trainable=False):
+        '''
+        Initializes the Convolutional layer
+            W is initialized with either Xavier or He initialization
+            b is initialized to zero
+            dm generates the dilation matrix that is used to dilated the kernels
 
-    def __init__(self,outChannels,inChannels,filter_size,dilation=2,stride=1,padding=0,*,trainable=False):
+        Args:
+            outChannels (int)   :   Number of output channels
+            inChannels (int)    :   size of output requred
+            filter_size (int)   :   Size of each kernel (filter_size x filter_size)
+            dilation (int)      :   Dilation factor to be used
+            stride (int)        :   Stride to be used
+            padding (int)       :   Padding to be used for convolution
+            init_method (str)   :   initialization method to be used for Weights
+            trainable (bool)    :   if set to False parameters of the layer are frozed
+                                    if set to True parameters are updated during optimizer step
         '''
-        Represents a Dialated Convolutional layer
-        '''
-        super(dilated_Conv,self).__init__(outChannels=outChannels,inChannels=inChannels,filter_size=filter_size,stride=stride,padding=padding,trainable=trainable)
+        super(dilated_Conv2D,self).__init__(outChannels=outChannels,inChannels=inChannels,filter_size=filter_size,stride=stride,padding=padding,trainable=trainable,init_method=init_method)
+        assert isinstance(dilation,int) and dilation>0
         self.dilation = dilation #currently supports only symmetical dilations
         self.dm = self._create_dilation_mat_()
 
     def _create_dilation_mat_(self):
+        '''
+        private:
+        generates a dilation matrix that is used to dilate the kernel
+
+        Returns:
+            dilation_mat (numpy.ndarray) : Matrix that is used to dilate the kernel
+        '''
         I = np.eye(self.W.shape[2])
         z = np.zeros((1,self.W.shape[2]))
         res =[]
@@ -606,9 +692,22 @@ class dilated_Conv(Conv):
             for k in range(self.dilation-1):
                 res.append(z)
         res = np.row_stack(res)
-        return res[:-self.dilation+1]
+        dilation_mat = res[:-self.dilation+1]
+        return dilation_mat
 
     def forward(self, X, train=True):
+        '''
+        Performs a forward pass through the dialted Convolution 2D layer:
+        Convolves Inputs with the kernels after dilation
+
+        Args:
+            X (numpy.ndarray)      :   Input array
+            train (bool)           :   Set true to cache X and X_col
+
+        Returns:
+            Output (numpy.ndarray) :   Output after Convolution
+        '''
+        # dilate the kernels using dilation matrix
         self.W_exp = self.dm@self.W@self.dm.T
         output,_ = self._convolve_(Input=X,kernel=self.W_exp,bias=self.b,padding= self.padding,stride = self.stride)
         if train:
@@ -616,6 +715,16 @@ class dilated_Conv(Conv):
         return output
 
     def backward(self, dY):
+        '''
+        Performs a backward pass through the dilated Conv2D Layer
+
+        Args:
+            dY (numpy.ndarray)  : Output gradient backpropagated from layers in the front
+
+        Returns:
+            dX (numpy.ndarray)  : Input gradient after backpropagating dY through dilated Conv2D
+            var_grad_list (list): If Layer is trainable contains (W,dW) and (b,db) otherwise []
+        '''
         if self.cache_in is None:
             raise RuntimeError('Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
         X = self.cache_in
