@@ -675,6 +675,9 @@ class dilated_Conv2D(Conv2D):
         assert isinstance(dilation,int) and dilation>0
         self.dilation = dilation #currently supports only symmetical dilations
         self.dm = self._create_dilation_mat_()
+        self.l_name = 'dilated_Conv2D'
+    def __repr__(self):
+        return f'Conv2D Layer with {self.W.shape[0]} dilation = {dilation} number of filters of shape {self.W.Shape[1:]}, Stide = {self.stride}, padding = {self.padding} Trainable = {self.trainable}'
 
     def _create_dilation_mat_(self):
         '''
