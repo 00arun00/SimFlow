@@ -787,7 +787,6 @@ class Conv2D(Layer):
         '''
         returns the dict of params required to recreate the layer
         '''
-        stride=1,padding=0,*,init_method='Xavier',trainable=False
         outChannels,inChannels,filter_size,_ = self.W.shape
         config = {"outChannels":outChannels,"inChannels":inChannels,
                     "stride":self.stride,"padding":self.padding,
@@ -922,7 +921,6 @@ class dilated_Conv2D(Conv2D):
         '''
         returns the dict of params required to recreate the layer
         '''
-        stride=1,padding=0,*,init_method='Xavier',trainable=False
         outChannels,inChannels,filter_size,_ = self.W.shape
         config = {"dilation":self.dilation}
         base_config = super(Conv2D,self)._get_config_()
