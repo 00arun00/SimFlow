@@ -1,0 +1,404 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Model &mdash; SimFlow 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Layers" href="layers.html" />
+    <link rel="prev" title="Summary" href="Summary.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> SimFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Summary.html">Summary</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="layers.html">Layers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="losses.html">Losses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iterators.html">Iterators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optimizers.html">Optimizers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_loaders.html">Data Loaders</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SimFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Model</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/model.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="model">
+<h1>Model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h1>
+<p>Models are used to create neural networks in SimFlow</p>
+<span class="target" id="module-model"></span><dl class="class">
+<dt id="model.Model">
+<em class="property">class </em><code class="descclassname">model.</code><code class="descname">Model</code><a class="reference internal" href="_modules/model.html#Model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.Model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a neural network with any combination of layers</p>
+<dl class="method">
+<dt id="model.Model.add_layer">
+<code class="descname">add_layer</code><span class="sig-paren">(</span><em>layer</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model.html#Model.add_layer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.Model.add_layer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a layer to the network in a sequential manner.
+The input to this layer will be the output of the last added layer
+or the initial inputs to the networks if this is the first layer added.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">layer (Layer):</th><td class="field-body">Layer to be added to the model</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.Model.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>Data</em>, <em>Labels</em>, <em>epochs=1</em>, <em>*</em>, <em>verbose=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model.html#Model.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.Model.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Trains the model on the provided Data and Labels</p>
+<p>Updates the model parameters which are trainable</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Data (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Data to fit on</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Labels (numpy.ndarray):</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body">Labels for the Data</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">epochs (int):</th><td class="field-body">Number of epochs to train</td>
+</tr>
+<tr class="field-even field"><th class="field-name">verbose (bool):</th><td class="field-body">Set to True to print progress, default True</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>Kwargs:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">optimizer(optimizer):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Optimizer to be used</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">iterator (Iterator):</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body">Iterator to be used</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.Model.get_params">
+<code class="descname">get_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model.html#Model.get_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.Model.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retruns the list of params in the model</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.Model.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>inputs</em>, <em>train=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model.html#Model.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.Model.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the output of the network for the given inputs.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">inputs (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Inputs to the network</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>Returns:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">output (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Outputs of the last layer of the network.</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.Model.score">
+<code class="descname">score</code><span class="sig-paren">(</span><em>Data</em>, <em>Labels</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model.html#Model.score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.Model.score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return loss and accuracy of a model on Data and Labels passed</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Data (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Data to find performance on</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Labels (numpy.ndarray):</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body">Labels to find performance on</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.Model.set_iterator">
+<code class="descname">set_iterator</code><span class="sig-paren">(</span><em>iterator</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model.html#Model.set_iterator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.Model.set_iterator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets up the iterator</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">iterator (Iterator):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Iterator to be used</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.Model.set_loss_fn">
+<code class="descname">set_loss_fn</code><span class="sig-paren">(</span><em>loss</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model.html#Model.set_loss_fn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.Model.set_loss_fn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the loss fuction that the network uses for training</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">loss (Loss):</th><td class="field-body">Loss function to be used</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.Model.set_optimizer">
+<code class="descname">set_optimizer</code><span class="sig-paren">(</span><em>optimizer</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/model.html#Model.set_optimizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.Model.set_optimizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the optmizier to be used</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">optimizer (Optimizer):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Optimizer to be used</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="model.Model.summary">
+<code class="descname">summary</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/model.html#Model.summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#model.Model.summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints a table describing the model layers and parameters used</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="layers.html" class="btn btn-neutral float-right" title="Layers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="Summary.html" class="btn btn-neutral" title="Summary" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Arun Joseph, Saurabh S. Kulkarni
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,8 @@
+Model
+=====
+
+Models are used to create neural networks in SimFlow
+
+
+.. automodule:: model
+	:members:

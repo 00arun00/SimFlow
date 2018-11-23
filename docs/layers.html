@@ -1,0 +1,1329 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Layers &mdash; SimFlow 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Losses" href="losses.html" />
+    <link rel="prev" title="Model" href="model.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> SimFlow
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Summary.html">Summary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model.html">Model</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Layers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-layers">Documentation with code</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="losses.html">Losses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iterators.html">Iterators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optimizers.html">Optimizers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_loaders.html">Data Loaders</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SimFlow</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Layers</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/layers.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="layers">
+<h1>Layers<a class="headerlink" href="#layers" title="Permalink to this headline">¶</a></h1>
+<p>Description of Class Layers</p>
+<p>All SimFlow layers have the following methods</p>
+<ul class="simple">
+<li><strong>layer.forward(X):</strong> return the output after passing it throught the layer</li>
+<li><strong>layer.backward(dY):</strong> returns the gradient after backpropogating it throught the layer</li>
+<li><strong>layer.get_params( ):</strong> returns the params of the layer as a list of Numpy arrays.</li>
+<li><strong>layer.set_params(new_params):</strong> sets the weights of the layer from a list of Numpy arrays (with the same shapes as the output of get_params)</li>
+</ul>
+<div class="section" id="module-layers">
+<span id="documentation-with-code"></span><h2>Documentation with code<a class="headerlink" href="#module-layers" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="layers.BN">
+<em class="property">class </em><code class="descclassname">layers.</code><code class="descname">BN</code><span class="sig-paren">(</span><em>dim</em>, <em>*</em>, <em>elr=0.9</em>, <em>trainable=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/layers.html#BN"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#layers.BN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Batch normalization  Layer (Full)</p>
+<dl class="docutils">
+<dt>During Train:</dt>
+<dd>BN(x) = gamma(X - mean(X_batch))/std(X_batch) + beta</dd>
+<dt>During Test:</dt>
+<dd>BN(x) = gamma((X - mean_learned)/Learned_std) + beta</dd>
+<dt>Initialization:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">beta:</th><td class="field-body">initialized to zeros</td>
+</tr>
+<tr class="field-even field"><th class="field-name">gamma:</th><td class="field-body">initialized to zeros</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">mean_learned:</th><td class="field-body">initialized to zeros</td>
+</tr>
+<tr class="field-even field"><th class="field-name">var_learned:</th><td class="field-body">initialized to zeros</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>Args:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">dim (int):</th><td class="field-body"><p class="first">size of input passed</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">elr (float):</th><td class="field-body"><p class="first">exponential learning rate for updating mean_learned</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">trainable (bool):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body"><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">False:</th><td class="field-body">parameters of the layer are frozed</td>
+</tr>
+<tr class="field-even field"><th class="field-name">True:</th><td class="field-body">parameters are updated during optimizer step</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+<dl class="method">
+<dt id="layers.BN.backward">
+<code class="descname">backward</code><span class="sig-paren">(</span><em>dY</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/layers.html#BN.backward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#layers.BN.backward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a backward pass through the BN Layer</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">dY (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Output gradient backpropagated from layers in the front</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>Returns:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">dX (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body"><p class="first">Input gradient after backpropagating dY through BN_mean layer</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">var_grad_list (list):</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body"><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">trainable = True:</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">[(gamma,dgamma), (beta,dbeta)]</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">trainable = False:</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body">[]</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="layers.BN.forward">
+<code class="descname">forward</code><span class="sig-paren">(</span><em>X</em>, <em>train=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/layers.html#BN.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#layers.BN.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a forward pass through the BN Layer</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">X (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Input array</td>
+</tr>
+<tr class="field-even field"><th class="field-name">train (bool):</th><td class="field-body">Set to True to enable caching for backward step</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>Returns:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Out (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Output after applying BN() transformation</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="layers.BN_mean">
+<em class="property">class </em><code class="descclassname">layers.</code><code class="descname">BN_mean</code><span class="sig-paren">(</span><em>dim</em>, <em>*</em>, <em>elr=0.9</em>, <em>trainable=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/layers.html#BN_mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#layers.BN_mean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mean only Batch normalization  Layer</p>
+<dl class="docutils">
+<dt>During Train:</dt>
+<dd>BN(x) = X - mean(X_batch) + beta</dd>
+<dt>During Test:</dt>
+<dd>BN(x) = X - mean_learned + beta</dd>
+<dt>Initialization:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">beta:</th><td class="field-body">initialized to zero</td>
+</tr>
+<tr class="field-even field"><th class="field-name">mean_learned:</th><td class="field-body">initialized to zero</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>Args:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">dim (int):</th><td class="field-body"><p class="first">size of input passed</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">elr (float):</th><td class="field-body"><p class="first">exponential learning rate for updating mean_learned</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">trainable (bool):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body"><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">False:</th><td class="field-body">parameters of the layer are frozed</td>
+</tr>
+<tr class="field-even field"><th class="field-name">True:</th><td class="field-body">parameters are updated during optimizer step</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+<dl class="method">
+<dt id="layers.BN_mean.backward">
+<code class="descname">backward</code><span class="sig-paren">(</span><em>dY</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/layers.html#BN_mean.backward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#layers.BN_mean.backward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a backward pass through the BN_mean Layer</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">dY (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Output gradient backpropagated from layers in the front</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>Returns:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">dX (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body"><p class="first">Input gradient after backpropagating dY through BN_mean layer</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">var_grad_list (list):</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body"><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">trainable = True:</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">[(beta,dbeta)]</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">trainable = False:</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body">[ ]</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="layers.BN_mean.forward">
+<code class="descname">forward</code><span class="sig-paren">(</span><em>X</em>, <em>train=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/layers.html#BN_mean.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#layers.BN_mean.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a forward pass through the BN_mean Layer</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">X (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Input array</td>
+</tr>
+<tr class="field-even field"><th class="field-name">train (bool):</th><td class="field-body">Set to True to enable caching for backward step</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>Returns:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Out (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Output after applying BN_mean() transformation</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="layers.Conv2D">
+<em class="property">class </em><code class="descclassname">layers.</code><code class="descname">Conv2D</code><span class="sig-paren">(</span><em>outChannels</em>, <em>inChannels</em>, <em>filter_size</em>, <em>stride=1</em>, <em>padding=0</em>, <em>*</em>, <em>init_method='Xavier'</em>, <em>trainable=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/layers.html#Conv2D"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#layers.Conv2D" title="Permalink to this definition">¶</a></dt>
+<dd><p>2D Convolutional Layer</p>
+<dl class="docutils">
+<dt>Initialization:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">W:</th><td class="field-body">initialized with either Xavier or He initialization</td>
+</tr>
+<tr class="field-even field"><th class="field-name">b:</th><td class="field-body">initialized to zero</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>Args:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">outChannels (int):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body"><p class="first">Number of output channels</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">inChannels (int):</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body"><p class="first">size of output requred</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">filter_size (int):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body"><p class="first">Size of each kernel (filter_size x filter_size)</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">stride (int):</th><td class="field-body"><p class="first">Stride to be used</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">padding (int):</th><td class="field-body"><p class="first">Padding to be used for convolution</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">init_method (str):</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body"><p class="first">initialization method to be used for Weights</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">trainable (bool):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body"><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">False:</th><td class="field-body">parameters of the layer are frozed</td>
+</tr>
+<tr class="field-even field"><th class="field-name">True:</th><td class="field-body">parameters are updated during optimizer step</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+<dl class="method">
+<dt id="layers.Conv2D.backward">
+<code class="descname">backward</code><span class="sig-paren">(</span><em>dY</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/layers.html#Conv2D.backward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#layers.Conv2D.backward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a backward pass through the Conv2D Layer</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">dY (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Output gradient backpropagated from layers in the front</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>Returns:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">dX (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body"><p class="first">Input gradient after backpropagating dY through Conv2D</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">var_grad_list (list):</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body"><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">trainable = True:</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">[(W,dW), (b,db)]</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">trainable = False:</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body">[ ]</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="layers.Conv2D.forward">
+<code class="descname">forward</code><span class="sig-paren">(</span><em>X</em>, <em>train=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/layers.html#Conv2D.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#layers.Conv2D.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a forward pass through the 2D Convolution layer:
+Convolves Inputs with the Weights</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">X (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Input array</td>
+</tr>
+<tr class="field-even field"><th class="field-name">train (bool):</th><td class="field-body">Set true to cache X and X_col</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>Returns:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Out (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Output after Convolution</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="layers.Dense">
+<em class="property">class </em><code class="descclassname">layers.</code><code class="descname">Dense</code><span class="sig-paren">(</span><em>input_dim</em>, <em>output_dim</em>, <em>*</em>, <em>init_method='Xavier'</em>, <em>trainable=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/layers.html#Dense"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#layers.Dense" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dense / Linear Layer</p>
+<dl class="docutils">
+<dt>Represent a linear transformation Y = X*W + b</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">X:</th><td class="field-body">is an numpy.ndarray with shape (batch_size, input_dim)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">W:</th><td class="field-body">is a trainable matrix with dimensions (input_dim, output_dim)</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">b:</th><td class="field-body">is a bias with dimensions (1, output_dim)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Y:</th><td class="field-body">is an numpy.ndarray with shape (batch_size, output_dim)</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>Initialization:</dt>
+<dd><table class="first docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">W:</th><td class="field-body">initialized with either Xavier or He initialization</td>
+</tr>
+<tr class="field-even field"><th class="field-name">b:</th><td class="field-body">initialized to zero</td>
+</tr>
+</tbody>
+</table>
+<dl class="last docutils">
+<dt>Args:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">input_dim (int):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body"><p class="first">size of input passed</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">output_dim (int):</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body"><p class="first">size of output requred</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">init_method (str):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body"><p class="first">initialization method to be used for Weights</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">trainable (bool):</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body"><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">False:</th><td class="field-body">parameters of the layer are frozed</td>
+</tr>
+<tr class="field-even field"><th class="field-name">True:</th><td class="field-body">parameters are updated during optimizer step</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="method">
+<dt id="layers.Dense.backward">
+<code class="descname">backward</code><span class="sig-paren">(</span><em>dY</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/layers.html#Dense.backward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#layers.Dense.backward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a backward pass through the Dense Layer</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">dY (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Output gradient backpropagated from layers in the front
+shape of dY is (batch_size x output_dim)</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>Returns:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">dX (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body"><p class="first">Input gradient after backpropagating dY through Dense layer</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">var_grad_list (list):</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body"><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">trainable = True:</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">[(W,dW),(b,db)]</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">trainable = False:</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body">[ ]</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="layers.Dense.forward">
+<code class="descname">forward</code><span class="sig-paren">(</span><em>X</em>, <em>train=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/layers.html#Dense.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#layers.Dense.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a forward pass through the Dense Layer</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">X (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Input array should be shape (batch_size x input_dim)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">train (bool):</th><td class="field-body">Set to True to enable gardient caching for backward step</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>Returns:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Out (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Output after applying transformation Y = X*W + b
+shape of output is (batch_size x output_dim)</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="layers.Flatten">
+<em class="property">class </em><code class="descclassname">layers.</code><code class="descname">Flatten</code><a class="reference internal" href="_modules/layers.html#Flatten"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#layers.Flatten" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flatten layer
+takes a tensor and converts it to a matrix
+This layer usually acts as an interface between conv layer and dense layer</p>
+<dl class="method">
+<dt id="layers.Flatten.backward">
+<code class="descname">backward</code><span class="sig-paren">(</span><em>dY</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/layers.html#Flatten.backward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#layers.Flatten.backward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a backward pass through the BN_mean Layer</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">dY (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Output gradient backpropagated from layers in the front</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>Returns:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">dX (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Input gradient after reshaping dY</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">var_grad_list (list):</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body">[], since layer is not trainable</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="layers.Flatten.forward">
+<code class="descname">forward</code><span class="sig-paren">(</span><em>X</em>, <em>train=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/layers.html#Flatten.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#layers.Flatten.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a forward pass through the Flatten Layer</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">X (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Input array</td>
+</tr>
+<tr class="field-even field"><th class="field-name">train (bool):</th><td class="field-body">No effect of this layer</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>Returns:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Out (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Output after flattening</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="layers.Layer">
+<em class="property">class </em><code class="descclassname">layers.</code><code class="descname">Layer</code><a class="reference internal" href="_modules/layers.html#Layer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#layers.Layer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract class representing a neural network layer</p>
+<dl class="method">
+<dt id="layers.Layer.backward">
+<code class="descname">backward</code><span class="sig-paren">(</span><em>dY</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/layers.html#Layer.backward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#layers.Layer.backward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates a backward pass through the layer.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">dY (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">The gradient of the output with dimensions (batch_size, output_size)</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>Returns:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">dX (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Gradient of the input (batch_size, output_size)</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">var_grad_list (list):</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body">List of tuples in the form (variable_pointer, variable_grad)</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="layers.Layer.forward">
+<code class="descname">forward</code><span class="sig-paren">(</span><em>X</em>, <em>train=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/layers.html#Layer.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#layers.Layer.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates a forward pass through the layer.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">X (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Input to the layer with dimensions (batch_size, input_size)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">train (bool):</th><td class="field-body">If true caches values required for backward function</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>Returns:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Out (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Output of the layer with dimensions (batch_size, output_size)</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="layers.Layer.get_params">
+<code class="descname">get_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/layers.html#Layer.get_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#layers.Layer.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the list of numpy array of weights</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="layers.Layer.set_params">
+<code class="descname">set_params</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/layers.html#Layer.set_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#layers.Layer.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the params of a layer with a given list of numpy arrays</p>
+<dl class="docutils">
+<dt>Ags:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">params (list of numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">new weights</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="layers.Linear">
+<code class="descclassname">layers.</code><code class="descname">Linear</code><a class="headerlink" href="#layers.Linear" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#layers.Dense" title="layers.Dense"><code class="xref py py-class docutils literal notranslate"><span class="pre">layers.Dense</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="layers.ReLU">
+<em class="property">class </em><code class="descclassname">layers.</code><code class="descname">ReLU</code><span class="sig-paren">(</span><em>*</em>, <em>trainable=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/layers.html#ReLU"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#layers.ReLU" title="Permalink to this definition">¶</a></dt>
+<dd><p>RelU layer
+Represent a nonlinear transformation Y = max(0,X)</p>
+<dl class="method">
+<dt id="layers.ReLU.backward">
+<code class="descname">backward</code><span class="sig-paren">(</span><em>dY</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/layers.html#ReLU.backward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#layers.ReLU.backward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a backward pass through the ReLU Layer</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">dY (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Output gradient backpropagated from layers in the front</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>Returns:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">dX (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Input gradient after backpropagating dY through ReLU layer</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">var_grad_list (list):</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body">[], since it has no parameter to be learned</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="layers.ReLU.forward">
+<code class="descname">forward</code><span class="sig-paren">(</span><em>X</em>, <em>train=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/layers.html#ReLU.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#layers.ReLU.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a forward pass through the ReLU Layer</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">X (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Input array</td>
+</tr>
+<tr class="field-even field"><th class="field-name">train (bool):</th><td class="field-body">Set to True to enable gardient caching for backward step</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>Returns:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Out (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Output after applying transformation Y = max(0,X)</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="layers.Sigmoid">
+<em class="property">class </em><code class="descclassname">layers.</code><code class="descname">Sigmoid</code><span class="sig-paren">(</span><em>*</em>, <em>trainable=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/layers.html#Sigmoid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#layers.Sigmoid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sigmoid layer
+Represent a nonlinear transformation Y = 1/(1+e^(-X))</p>
+<dl class="method">
+<dt id="layers.Sigmoid.backward">
+<code class="descname">backward</code><span class="sig-paren">(</span><em>dY</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/layers.html#Sigmoid.backward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#layers.Sigmoid.backward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a backward pass through the Sigmoid Layer</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">dY (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Output gradient backpropagated from layers in the front</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>Returns:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">dX (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Input gradient after backpropagating dY through Sigmoid layer</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">var_grad_list (list):</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body">[], since it has no parameter to be learned</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="layers.Sigmoid.forward">
+<code class="descname">forward</code><span class="sig-paren">(</span><em>X</em>, <em>train=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/layers.html#Sigmoid.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#layers.Sigmoid.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a forward pass through the Sigmoid Layer</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">X (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Input array</td>
+</tr>
+<tr class="field-even field"><th class="field-name">train (bool):</th><td class="field-body">Set to True to enable caching for backward step</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>Returns:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Out (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Output after applying transformation Y = 1/(1+e^(-X))</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="layers.Tanh">
+<em class="property">class </em><code class="descclassname">layers.</code><code class="descname">Tanh</code><span class="sig-paren">(</span><em>*</em>, <em>trainable=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/layers.html#Tanh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#layers.Tanh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tanh layer
+Represent a nonlinear transformation Y = (1-e^(-2X))/(1+e^(-2X)) {tanh}</p>
+<dl class="method">
+<dt id="layers.Tanh.backward">
+<code class="descname">backward</code><span class="sig-paren">(</span><em>dY</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/layers.html#Tanh.backward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#layers.Tanh.backward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a backward pass through the Tanh Layer</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">dY (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Output gradient backpropagated from layers in the front</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>Returns:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">dX (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Input gradient after backpropagating dY through Tanh layer</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">var_grad_list (list):</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body">[], since it has no parameter to be learned</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="layers.Tanh.forward">
+<code class="descname">forward</code><span class="sig-paren">(</span><em>X</em>, <em>train=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/layers.html#Tanh.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#layers.Tanh.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a forward pass through the Tanh Layer</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">X (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Input array</td>
+</tr>
+<tr class="field-even field"><th class="field-name">train (bool):</th><td class="field-body">Set to True to enable caching for backward step</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>Returns:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Out (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Output after applying transformation Y = tanh(X)</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="layers.dilated_Conv2D">
+<em class="property">class </em><code class="descclassname">layers.</code><code class="descname">dilated_Conv2D</code><span class="sig-paren">(</span><em>outChannels</em>, <em>inChannels</em>, <em>filter_size</em>, <em>dilation=2</em>, <em>stride=1</em>, <em>padding=0</em>, <em>*</em>, <em>init_method='Xavier'</em>, <em>trainable=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/layers.html#dilated_Conv2D"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#layers.dilated_Conv2D" title="Permalink to this definition">¶</a></dt>
+<dd><p>2D Dilated Convolutional Layer</p>
+<dl class="docutils">
+<dt>Initialization:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">W:</th><td class="field-body">initialized with either Xavier or He initialization</td>
+</tr>
+<tr class="field-even field"><th class="field-name">b:</th><td class="field-body">initialized to zero</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">dm:</th><td class="field-body">dilation matrix that is used to dilated the kernels</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>Args:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">outChannels (int):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body"><p class="first">Number of output channels</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">inChannels (int):</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body"><p class="first">size of output requred</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">filter_size (int):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body"><p class="first">Size of each kernel (filter_size x filter_size)</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">dilation (int):</th><td class="field-body"><p class="first">Dilation factor to be used</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">stride (int):</th><td class="field-body"><p class="first">Stride to be used</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">padding (int):</th><td class="field-body"><p class="first">Padding to be used for convolution</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">init_method (str):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body"><p class="first">initialization method to be used for Weights</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">trainable (bool):</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body"><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">False:</th><td class="field-body">parameters of the layer are frozed</td>
+</tr>
+<tr class="field-even field"><th class="field-name">True:</th><td class="field-body">parameters are updated during optimizer step</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+<dl class="method">
+<dt id="layers.dilated_Conv2D.backward">
+<code class="descname">backward</code><span class="sig-paren">(</span><em>dY</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/layers.html#dilated_Conv2D.backward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#layers.dilated_Conv2D.backward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a backward pass through the dilated Conv2D Layer</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">dY (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Output gradient backpropagated from layers in the front</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>Returns:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">dX (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body"><p class="first">Input gradient after backpropagating dY through dilated Conv2D</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">var_grad_list (list):</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body"><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">trainable = True:</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">[(W,dW), (b,db)]</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">trainable = False:</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body">[ ]</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="layers.dilated_Conv2D.forward">
+<code class="descname">forward</code><span class="sig-paren">(</span><em>X</em>, <em>train=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/layers.html#dilated_Conv2D.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#layers.dilated_Conv2D.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a forward pass through the dialted Convolution 2D layer:
+Convolves Inputs with the kernels after dilation</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">X (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Input array</td>
+</tr>
+<tr class="field-even field"><th class="field-name">train (bool):</th><td class="field-body">Set true to cache X and X_col</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt>Returns:</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Output (numpy.ndarray):</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Output after Convolution</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="layers.relu">
+<code class="descclassname">layers.</code><code class="descname">relu</code><a class="headerlink" href="#layers.relu" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#layers.ReLU" title="layers.ReLU"><code class="xref py py-class docutils literal notranslate"><span class="pre">layers.ReLU</span></code></a></p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="losses.html" class="btn btn-neutral float-right" title="Losses" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="model.html" class="btn btn-neutral" title="Model" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Arun Joseph, Saurabh S. Kulkarni
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

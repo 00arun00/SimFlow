@@ -1,0 +1,19 @@
+Layers 
+=======
+
+Description of Class Layers
+
+All SimFlow layers have the following methods
+
+- **layer.forward(X):** return the output after passing it throught the layer
+- **layer.backward(dY):** returns the gradient after backpropogating it throught the layer 
+- **layer.get_params( ):** returns the params of the layer as a list of Numpy arrays.
+- **layer.set_params(new_params):** sets the weights of the layer from a list of Numpy arrays (with the same shapes as the output of get_params)
+
+
+Documentation with code
+-----------------------
+
+.. automodule:: layers
+   :members:
+
