@@ -1,0 +1,7 @@
+iterators module
+================
+
+.. automodule:: iterators
+    :members:
+    :undoc-members:
+    :show-inheritance:

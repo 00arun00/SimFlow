@@ -1,0 +1,7 @@
+data\_loader\_mnist module
+==========================
+
+.. automodule:: data_loader_mnist
+    :members:
+    :undoc-members:
+    :show-inheritance:
