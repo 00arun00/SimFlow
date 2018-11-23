@@ -66,10 +66,35 @@ class Layer(object):
         else:
             return f'Layer'
 
+    def get_params(self):
+        '''
+        Returns the list of numpy array of weights
+        '''
+        if hasattr(self,'params'):
+            return self.params
+        else:
+            raise ValueError('Params not defined')
+
+    def set_params(self,params):
+        '''
+        Sets the params of a layer with a given list of numpy arrays
+
+        Ags:
+            :params (list of numpy.ndarray): new weights
+
+        '''
+        old_params = self.get_params()
+        assert len(old_params) == len(params),"length mismatch"
+        assert all(params[i].shape == old_params[i].shape for i in range(len(old_params))),"shape missmatch"
+        for (op,p) in zip(old_params,params):
+            op = p
+
+
+
 class Dense(Layer):
     '''
     Dense / Linear Layer
-    
+
     Represent a linear transformation Y = X*W + b
         :X: is an numpy.ndarray with shape (batch_size, input_dim)
         :W: is a trainable matrix with dimensions (input_dim, output_dim)
@@ -108,6 +133,7 @@ class Dense(Layer):
         self.cache_in = None
         self.trainable = trainable
         self.l_name = 'Dense'
+        self.params = [self.W,self.b]
 
     def forward(self, X, train=True):
         '''
@@ -176,6 +202,7 @@ class ReLU(Layer):
         self.cache_in = None
         self.trainable = trainable
         self.l_name = 'ReLU'
+        self.params = []
 
     def forward(self, X, train=True):
         '''
@@ -226,6 +253,7 @@ class Sigmoid(Layer):
         self.cache_in = None
         self.trainable = trainable
         self.l_name = 'Sigmoid'
+        self.params = []
 
     def forward(self, X, train=True):
         '''
@@ -273,6 +301,7 @@ class Tanh(Layer):
         self.cache_in = None
         self.trainable = trainable
         self.l_name = 'Tanh'
+        self.params = []
 
     def forward(self, X, train=True):
         '''
@@ -348,6 +377,7 @@ class BN_mean(Layer):
         self.elr = elr
         self.trainable=trainable
         self.l_name = 'Mean only Batchnorm'
+        self.params = [self.beta]
 
     def forward(self, X, train=True):
         '''
@@ -447,6 +477,7 @@ class BN(Layer):
         self.trainable=trainable
         self.l_name = 'Batchnorm'
         self.eps=1e-10 #to avoid division_by_zero error if var = 0
+        self.params = [self.gamma,self.beta]
 
     def forward(self, X, train=True):
         '''
@@ -530,6 +561,7 @@ class Flatten(Layer):
         '''
         self.cache_in = None
         self.l_name = 'Flatten'
+        self.params = []
 
     def forward(self, X, train=True):
         '''
@@ -610,6 +642,7 @@ class Conv2D(Layer):
         self.padding = padding
         self.trainable = trainable
         self.l_name = 'Conv2D'
+        self.params = [self.W,self.b]
 
     def __repr__(self):
         return f'Conv2D Layer with {self.W.shape[0]} number of filters of shape {self.W.Shape[1:]}, Stide = {self.stride}, padding = {self.padding} Trainable = {self.trainable}'

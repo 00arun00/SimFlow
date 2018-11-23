@@ -14,6 +14,43 @@ class Model(object):
         self.layers = []
         self.loss = None
 
+    def summary(self):
+        '''
+        Prints a table describing the model layers and parameters used
+        '''
+        # currently not the most elegant implementation
+        dash = "-"*75
+        print(dash)
+        print('{:<30s}|{:22s}|{:20s}'.format("Name","Trainable Parameters","Total Parameters"))
+        print(dash)
+        total_params = 0
+        total_trainable_params = 0
+
+        for layer in self.layers:
+            param_size = 0
+            trainable_param_size = 0
+            for p in layer.params:
+                param_size += np.prod(p.shape)
+                if layer.trainable:
+                    trainable_param_size +=np.prod(p.shape)
+            print('{:<30s}|{:>22d}|{:>20d}'.format(layer.l_name,trainable_param_size, param_size))
+            total_params+=param_size
+            total_trainable_params+=trainable_param_size
+        print(dash)
+        print('{:<30s}|{:>22d}|{:>20d}'.format("Total",total_trainable_params, total_params))
+        print(dash)
+
+    def get_params(self):
+        '''
+        Retruns the list of params in the model
+        '''
+        param_list=[]
+        for layer in self.layers:
+            param_list+=[(layer.l_name,layer.get_params())]
+        return param_list
+
+
+
     def add_layer(self, layer):
         '''
         Adds a layer to the network in a sequential manner.
@@ -54,7 +91,7 @@ class Model(object):
         '''
         Calculates the loss of the network for the given inputs and labels
         returns the list of tuples with variables and their curresponding gradients
-        
+
         Args:
             :inputs (numpy.ndarray): Inputs to the network
             :labels (numpy.ndarray): Int representation of the labels (eg. the third class is represented by 2)
@@ -104,7 +141,7 @@ class Model(object):
         Args:
             :Data (numpy.ndarray): Data to fit on
             :Labels (numpy.ndarray): Labels for the Data
-            :epochs (int): Number of epochs to train for
+            :epochs (int): Number of epochs to train
             :verbose (bool): Set to True to print progress, default True
         Kwargs:
             :optimizer(optimizer): Optimizer to be used
