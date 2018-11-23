@@ -2,6 +2,7 @@ import numpy as np
 class Iterator(object):
     '''
     Class representing Iterator
+    
     Args:
         :batch_size (int): batch size to used
         :shuffle (bool): shuffles each time if set to True
@@ -50,6 +51,7 @@ class Iterator(object):
 class minibatch_iterator(Iterator):
     '''
     mini_batch iterator
+
     Args:
         :batch_size (int): batch size to used
         :shuffle (bool): shuffles each time if set to True
@@ -70,6 +72,7 @@ class minibatch_iterator(Iterator):
 class fullbatch_iterator(Iterator):
     '''
     Full batch iterator
+
     Args:
         :shuffle (bool): shuffles each time if set to True
     '''
@@ -86,6 +89,7 @@ class fullbatch_iterator(Iterator):
 class stochastic_iterator(Iterator):
     '''
     Stochastic iterator
+
     Args:
         :shuffle (bool): shuffles each time if set to True
     '''
