@@ -10,17 +10,16 @@ class SoftmaxCrossEntropyLoss(Loss):
     '''
     Represents the categorical softmax cross entropy loss
     '''
-
     def get_loss(self, scores, labels):
         '''
         Calculates the average categorical softmax cross entropy loss.
+        
         Args:
-            scores (numpy.ndarray): Unnormalized logit class scores. Shape (batch_size, num_classes)
-            labels (numpy.ndarray): True labels represented as ints (eg. 2 represents the third class). Shape (batch_size)
+            :scores (numpy.ndarray): Unnormalized logit class scores. Shape (batch_size, num_classes)
+            :labels (numpy.ndarray): True labels represented as ints (eg. 2 represents the third class). Shape (batch_size)
         Returns:
-            loss, grad
-            loss (float): The average cross entropy between labels and the softmax normalization of scores
-            grad (numpy.ndarray): Gradient for scores with respect to the loss. Shape (batch_size, num_classes)
+            :loss (float): The average cross entropy between labels and the softmax normalization of scores
+            :grad (numpy.ndarray): Gradient for scores with respect to the loss. Shape (batch_size, num_classes)
         '''
         scores_norm = scores - np.max(scores, axis=1, keepdims=True)
         scores_norm = np.exp(scores_norm)

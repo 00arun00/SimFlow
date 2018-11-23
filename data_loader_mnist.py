@@ -2,12 +2,17 @@ import numpy as np
 def load_normalized_mnist_data_flat():
     '''
     Loads and normalizes the MNIST data. Reads the data from
-        data/mnist_train.csv
-        data/mnist_test.csv
+
+        -data/mnist_train.csv
+        -data/mnist_test.csv
+
     If these are not present they are downloaded and saved from
     https://pjreddie.com/projects/mnist-in-csv/
 
-    Returns two dictionaries, input and labels
+    Returns:
+        :input (dict of numpy.ndarray):  Input
+        :labels (dict of numpy.ndarray):  Lables
+
     Each has keys 'train', 'val', 'test' which map to numpy arrays
     '''
     try:
@@ -75,12 +80,17 @@ def load_normalized_mnist_data_flat():
 def load_normalized_mnist_data_conv():
     '''
     Loads and normalizes the MNIST data. Reads the data from
-        data/mnist_train.csv
-        data/mnist_test.csv
+
+        -data/mnist_train.csv
+        -data/mnist_test.csv
+
     If these are not present they are downloaded and saved from
     https://pjreddie.com/projects/mnist-in-csv/
 
-    Returns two dictionaries, input and labels
+    Returns:
+        :input (dict of numpy.ndarray):  Input
+        :labels (dict of numpy.ndarray):  Lables
+
     Each has keys 'train', 'val', 'test' which map to numpy arrays
     '''
     print('loading data please wait will take around a minute')

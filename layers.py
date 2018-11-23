@@ -69,6 +69,7 @@ class Layer(object):
 class Dense(Layer):
     '''
     Dense / Linear Layer
+    
     Represent a linear transformation Y = X*W + b
         :X: is an numpy.ndarray with shape (batch_size, input_dim)
         :W: is a trainable matrix with dimensions (input_dim, output_dim)

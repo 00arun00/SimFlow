@@ -2,7 +2,9 @@ import numpy as np
 class Iterator(object):
     '''
     Class representing Iterator
-    Takes Data and labels and returns a gerator that can be used to iterate through the data
+    Args:
+        :batch_size (int): batch size to used
+        :shuffle (bool): shuffles each time if set to True
     '''
     def __init__(self,batch_size=128,*,shuffle=True):
         '''
@@ -20,11 +22,11 @@ class Iterator(object):
         Creates a generator to iterate through the Data
 
         Args:
-            Data (numpy.ndarray)   : Input to be iterated over
-            Labels (numpy.ndarray) : Labesl to be iterated over
+            :Data (numpy.ndarray): Input to be iterated over
+            :Labels (numpy.ndarray): Labesl to be iterated over
 
         Returns:
-            generator (generator)  : return a generator that can be used to iterate over Data and Labels
+            :generator (generator): return a generator that can be used to iterate over Data and Labels
         """
         n_train = Data.shape[0]
         assert Data.shape[0]==Labels.shape[0],'Number of Data not same as number of Labels'
@@ -46,6 +48,12 @@ class Iterator(object):
         return f'{self.method} iterator with shuffling = {self.shuffle}'
 
 class minibatch_iterator(Iterator):
+    '''
+    mini_batch iterator
+    Args:
+        :batch_size (int): batch size to used
+        :shuffle (bool): shuffles each time if set to True
+    '''
     def __init__(self,batch_size=128,*,shuffle=True):
         '''
         Initializes the Iterator
@@ -60,6 +68,11 @@ class minibatch_iterator(Iterator):
         return f'mini_batch iterator with batch_size = {self.batch_size} and shuffling = {self.shuffle}'
 
 class fullbatch_iterator(Iterator):
+    '''
+    Full batch iterator
+    Args:
+        :shuffle (bool): shuffles each time if set to True
+    '''
     def __init__(self,*,shuffle=True):
         '''
         Initializes the Iterator
@@ -71,6 +84,11 @@ class fullbatch_iterator(Iterator):
         self.method = 'full batch'
 
 class stochastic_iterator(Iterator):
+    '''
+    Stochastic iterator
+    Args:
+        :shuffle (bool): shuffles each time if set to True
+    '''
     def __init__(self,*,shuffle=True):
         '''
         Initializes the Iterator

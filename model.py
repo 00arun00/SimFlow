@@ -19,6 +19,7 @@ class Model(object):
         Adds a layer to the network in a sequential manner.
         The input to this layer will be the output of the last added layer
         or the initial inputs to the networks if this is the first layer added.
+
         Args:
             :layer (Layer): Layer to be added to the model
         '''
@@ -28,6 +29,7 @@ class Model(object):
     def set_loss_fn(self, loss):
         '''
         Sets the loss fuction that the network uses for training
+
         Args:
             :loss (Loss): Loss function to be used
         '''
@@ -37,6 +39,7 @@ class Model(object):
     def predict(self, inputs, train=False):
         '''
         Calculates the output of the network for the given inputs.
+
         Args:
             :inputs (numpy.ndarray): Inputs to the network
         Returns:
@@ -51,6 +54,7 @@ class Model(object):
         '''
         Calculates the loss of the network for the given inputs and labels
         returns the list of tuples with variables and their curresponding gradients
+        
         Args:
             :inputs (numpy.ndarray): Inputs to the network
             :labels (numpy.ndarray): Int representation of the labels (eg. the third class is represented by 2)

@@ -74,6 +74,7 @@ class SGD(Optimizer):
     def update_step(self,vars_and_grads):
         '''
         updates vara and grads using SGD
+        
         Args:
             vars_and_grads (list of tuples of numpy.ndarray) : list of tuples of variable and gradient to be updated
         '''
