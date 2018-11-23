@@ -46,7 +46,6 @@ def test_linear_back():
     dx,grads = lin_layer.backward(random_output_gradient)
     dW,db = grads[0][1],grads[1][1]
 
-    print("Testing backward pass of batch norm Layer")
     assert np.allclose(dx,dx_num,atol=eps)
     assert np.allclose(dW,dw_num,atol=eps)
     assert np.allclose(db,db_num,atol=eps)

@@ -36,7 +36,6 @@ def test_dilated_conv_layer_back_prop():
     dx,grads = dc_layer.backward(dout)
     dw,db = grads[0][1],grads[1][1]
 
-    print("Testing backward pass of Conv Layer")
     assert np.allclose(dx,dx_num,atol=eps)
     assert np.allclose(dw,dw_num,atol=eps)
     assert np.allclose(db,db_num,atol=eps)

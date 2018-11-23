@@ -1,0 +1,4 @@
+{
+  "testing/test_activations.py::test_ELU_back_prop": true,
+  "testing/test_try.py::test_try_ELU_back_prop": true
+}
