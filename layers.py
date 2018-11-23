@@ -9,11 +9,11 @@ class Layer(object):
         Calculates a forward pass through the layer.
 
         Args:
-            X (numpy.ndarray) :   Input to the layer with dimensions (batch_size, input_size)
-            train (bool)      :   If true caches values required for backward function
+            :X (numpy.ndarray):   Input to the layer with dimensions (batch_size, input_size)
+            :train (bool):   If true caches values required for backward function
 
         Returns:
-            (numpy.ndarray)   :   Output of the layer with dimensions (batch_size, output_size)
+            :Out (numpy.ndarray):   Output of the layer with dimensions (batch_size, output_size)
         '''
         raise NotImplementedError('This is an abstract class')
 
@@ -22,12 +22,11 @@ class Layer(object):
         Calculates a backward pass through the layer.
 
         Args:
-            dY (numpy.ndarray)   :   The gradient of the output with dimensions (batch_size, output_size)
+            :dY (numpy.ndarray):   The gradient of the output with dimensions (batch_size, output_size)
 
         Returns:
-            dX, var_grad_list
-            dX (numpy.ndarray)   :   Gradient of the input (batch_size, output_size)
-            var_grad_list (list) :   List of tuples in the form (variable_pointer, variable_grad)
+            :dX (numpy.ndarray):   Gradient of the input (batch_size, output_size)
+            :var_grad_list (list):   List of tuples in the form (variable_pointer, variable_grad)
         '''
         raise NotImplementedError('This is an abstract class')
 
@@ -36,8 +35,8 @@ class Layer(object):
         Initializes the parameter passes as argument using Xavier of He initialization
 
         Args:
-            W (numpy.ndarray) : Parameter to be initialized
-            init_method (str) : Method to initialize the parameter
+            W (numpy.ndarray): Parameter to be initialized
+            init_method (str): Method to initialize the parameter
 
         """
         if init_method == 'Xavier':
@@ -71,16 +70,28 @@ class Dense(Layer):
     '''
     Dense / Linear Layer
     Represent a linear transformation Y = X*W + b
-        X is an numpy.ndarray with shape (batch_size, input_dim)
-        W is a trainable matrix with dimensions (input_dim, output_dim)
-        b is a bias with dimensions (1, output_dim)
-        Y is an numpy.ndarray with shape (batch_size, output_dim)
+        :X: is an numpy.ndarray with shape (batch_size, input_dim)
+        :W: is a trainable matrix with dimensions (input_dim, output_dim)
+        :b: is a bias with dimensions (1, output_dim)
+        :Y: is an numpy.ndarray with shape (batch_size, output_dim)
+
+    Initialization:
+        :W: initialized with either Xavier or He initialization
+        :b: initialized to zero
+
+        Args:
+            :input_dim (int): size of input passed
+            :output_dim (int): size of output requred
+            :init_method (str): initialization method to be used for Weights
+            :trainable (bool):
+                :False: parameters of the layer are frozed
+                :True: parameters are updated during optimizer step
     '''
     def __init__(self, input_dim, output_dim,*,init_method='Xavier',trainable = True):
         '''
         Initializes the Desnse layer parameter
-            W is initialized with either Xavier or He initialization
-            b is initialized to zero
+            :W: is initialized with either Xavier or He initialization
+            :b: is initialized to zero
 
         Args:
             input_dim (int)   : size of input passed
@@ -102,11 +113,11 @@ class Dense(Layer):
         Performs a forward pass through the Dense Layer
 
         Args:
-            X (numpy.ndarray)   : Input array should be shape (batch_size x input_dim)
-            train (bool)        : Set to True to enable gardient caching for backward step
+            :X (numpy.ndarray): Input array should be shape (batch_size x input_dim)
+            :train (bool): Set to True to enable gardient caching for backward step
 
         Returns:
-            Out (numpy.ndarray) : Output after applying transformation Y = X*W + b
+            :Out (numpy.ndarray): Output after applying transformation Y = X*W + b
                                   shape of output is (batch_size x output_dim)
         '''
         assert len(X.shape)==2,"input dimenstions not supported"
@@ -121,12 +132,14 @@ class Dense(Layer):
         Performs a backward pass through the Dense Layer
 
         Args:
-            dY (numpy.ndarray)  : Output gradient backpropagated from layers in the front
+            :dY (numpy.ndarray): Output gradient backpropagated from layers in the front
                                   shape of dY is (batch_size x output_dim)
 
         Returns:
-            dX (numpy.ndarray)  : Input gradient after backpropagating dY through Dense layer
-            var_grad_list (list): If Layer is trainable contains (W,dW) and (b,db) otherwise []
+            :dX (numpy.ndarray): Input gradient after backpropagating dY through Dense layer
+            :var_grad_list (list):
+                :trainable = True: [(W,dW),(b,db)]
+                :trainable = False: [ ]
         '''
         dX = dY@self.W.T
         if self.trainable:
@@ -168,11 +181,11 @@ class ReLU(Layer):
         Performs a forward pass through the ReLU Layer
 
         Args:
-            X (numpy.ndarray)   : Input array
-            train (bool)        : Set to True to enable gardient caching for backward step
+            :X (numpy.ndarray): Input array
+            :train (bool): Set to True to enable gardient caching for backward step
 
         Returns:
-            Out (numpy.ndarray) : Output after applying transformation Y = max(0,X)
+            :Out (numpy.ndarray): Output after applying transformation Y = max(0,X)
         '''
         out = np.maximum(X,0)
         if train:
@@ -184,11 +197,11 @@ class ReLU(Layer):
         Performs a backward pass through the ReLU Layer
 
         Args:
-            dY (numpy.ndarray)   : Output gradient backpropagated from layers in the front
+            :dY (numpy.ndarray): Output gradient backpropagated from layers in the front
 
         Returns:
-            dX (numpy.ndarray)   : Input gradient after backpropagating dY through ReLU layer
-            var_grad_list (list) : [], since it has no parameter to be learned
+            :dX (numpy.ndarray): Input gradient after backpropagating dY through ReLU layer
+            :var_grad_list (list): [], since it has no parameter to be learned
         '''
         if self.cache_in is None:
             raise RuntimeError('Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
@@ -206,7 +219,7 @@ class Sigmoid(Layer):
 
     def __init__(self,*,trainable=True):
         '''
-        Initialization :
+        Initialization:
             Does nothing since nothing to initialize
         '''
         self.cache_in = None
@@ -218,11 +231,11 @@ class Sigmoid(Layer):
         Performs a forward pass through the Sigmoid Layer
 
         Args:
-            X (numpy.ndarray)   : Input array
-            train (bool)        : Set to True to enable caching for backward step
+            :X (numpy.ndarray): Input array
+            :train (bool): Set to True to enable caching for backward step
 
         Returns:
-            Out (numpy.ndarray) : Output after applying transformation Y = 1/(1+e^(-X))
+            :Out (numpy.ndarray): Output after applying transformation Y = 1/(1+e^(-X))
         '''
         out = 1/(1+np.exp(-X))
         if train:
@@ -234,11 +247,11 @@ class Sigmoid(Layer):
         Performs a backward pass through the Sigmoid Layer
 
         Args:
-            dY (numpy.ndarray)   : Output gradient backpropagated from layers in the front
+            :dY (numpy.ndarray): Output gradient backpropagated from layers in the front
 
         Returns:
-            dX (numpy.ndarray)   : Input gradient after backpropagating dY through Sigmoid layer
-            var_grad_list (list) : [], since it has no parameter to be learned
+            :dX (numpy.ndarray): Input gradient after backpropagating dY through Sigmoid layer
+            :var_grad_list (list): [], since it has no parameter to be learned
         '''
         if self.cache_in is None:
             raise RuntimeError('Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
@@ -265,11 +278,11 @@ class Tanh(Layer):
         Performs a forward pass through the Tanh Layer
 
         Args:
-            X (numpy.ndarray)   : Input array
-            train (bool)        : Set to True to enable caching for backward step
+            :X (numpy.ndarray): Input array
+            :train (bool): Set to True to enable caching for backward step
 
         Returns:
-            Out (numpy.ndarray) : Output after applying transformation Y = tanh(X)
+            :Out (numpy.ndarray): Output after applying transformation Y = tanh(X)
         '''
         out = np.tanh(X)
         if train:
@@ -281,11 +294,11 @@ class Tanh(Layer):
         Performs a backward pass through the Tanh Layer
 
         Args:
-            dY (numpy.ndarray)   : Output gradient backpropagated from layers in the front
+            :dY (numpy.ndarray): Output gradient backpropagated from layers in the front
 
         Returns:
-            dX (numpy.ndarray)   : Input gradient after backpropagating dY through Tanh layer
-            var_grad_list (list) : [], since it has no parameter to be learned
+            :dX (numpy.ndarray): Input gradient after backpropagating dY through Tanh layer
+            :var_grad_list (list): [], since it has no parameter to be learned
         '''
 
         if self.cache_in is None:
@@ -296,12 +309,24 @@ class Tanh(Layer):
 
 class BN_mean(Layer):
     '''
-    Represents a mean only Batch normalization  Layer
-        During Train:
+    Mean only Batch normalization  Layer
+
+    During Train:
         BN(x) = X - mean(X_batch) + beta
 
-        During Test:
-        BN(x) = X - Learned_mean + beta
+    During Test:
+        BN(x) = X - mean_learned + beta
+
+    Initialization:
+        :beta: initialized to zero
+        :mean_learned: initialized to zero
+
+    Args:
+        :dim (int): size of input passed
+        :elr (float): exponential learning rate for updating mean_learned
+        :trainable (bool):
+            :False: parameters of the layer are frozed
+            :True: parameters are updated during optimizer step
     '''
     def __init__(self,dim,*,elr=0.9,trainable=True):
         '''
@@ -328,11 +353,11 @@ class BN_mean(Layer):
         Performs a forward pass through the BN_mean Layer
 
         Args:
-            X (numpy.ndarray)   : Input array
-            train (bool)        : Set to True to enable caching for backward step
+            :X (numpy.ndarray): Input array
+            :train (bool): Set to True to enable caching for backward step
 
         Returns:
-            Out (numpy.ndarray) : Output after applying BN_mean() transformation
+            :Out (numpy.ndarray): Output after applying BN_mean() transformation
         '''
         X_shape = X.shape
         X_flat = X.reshape(X_shape[0],-1)
@@ -352,11 +377,13 @@ class BN_mean(Layer):
         Performs a backward pass through the BN_mean Layer
 
         Args:
-            dY (numpy.ndarray)  : Output gradient backpropagated from layers in the front
+            :dY (numpy.ndarray): Output gradient backpropagated from layers in the front
 
         Returns:
-            dX (numpy.ndarray)  : Input gradient after backpropagating dY through BN_mean layer
-            var_grad_list (list): If Layer is trainable contains (beta,dbeta)  otherwise []
+            :dX (numpy.ndarray): Input gradient after backpropagating dY through BN_mean layer
+            :var_grad_list (list):
+                :trainable = True: [(beta,dbeta)]
+                :trainable = False: [ ]
         '''
         dY_shape = dY.shape
         dY_flat = dY.reshape(dY_shape[0],-1)
@@ -373,13 +400,26 @@ class BN_mean(Layer):
 
 class BN(Layer):
     '''
-    Represents a Batch normalization  Layer (BN)
-        During Train :
+    Batch normalization  Layer (Full)
+
+    During Train:
         BN(x) = gamma(X - mean(X_batch))/std(X_batch) + beta
 
-        During Test :
-        BN(x) = gamma((X - Learned_mean)/Learned_std) + beta
+    During Test:
+        BN(x) = gamma((X - mean_learned)/Learned_std) + beta
 
+    Initialization:
+        :beta: initialized to zeros
+        :gamma: initialized to zeros
+        :mean_learned: initialized to zeros
+        :var_learned: initialized to zeros
+
+    Args:
+        :dim (int): size of input passed
+        :elr (float): exponential learning rate for updating mean_learned
+        :trainable (bool):
+            :False: parameters of the layer are frozed
+            :True: parameters are updated during optimizer step
     '''
     def __init__(self,dim,*,elr=0.9,trainable=True):
         '''
@@ -412,11 +452,11 @@ class BN(Layer):
         Performs a forward pass through the BN Layer
 
         Args:
-            X (numpy.ndarray)   : Input array
-            train (bool)        : Set to True to enable caching for backward step
+            :X (numpy.ndarray): Input array
+            :train (bool): Set to True to enable caching for backward step
 
         Returns:
-            Out (numpy.ndarray) : Output after applying BN() transformation
+            :Out (numpy.ndarray): Output after applying BN() transformation
         '''
         X_shape = X.shape
         X_flat = X.reshape(X_shape[0],-1)
@@ -443,11 +483,13 @@ class BN(Layer):
         Performs a backward pass through the BN Layer
 
         Args:
-            dY (numpy.ndarray)  : Output gradient backpropagated from layers in the front
+            :dY (numpy.ndarray): Output gradient backpropagated from layers in the front
 
         Returns:
-            dX (numpy.ndarray)  : Input gradient after backpropagating dY through BN_mean layer
-            var_grad_list (list): If Layer is trainable contains (gamma,dgamma) and (beta,dbeta)  otherwise []
+            :dX (numpy.ndarray): Input gradient after backpropagating dY through BN_mean layer
+            :var_grad_list (list):
+                :trainable = True: [(gamma,dgamma), (beta,dbeta)]
+                :trainable = False: []
         '''
         if self.cache_in is None:
           raise RuntimeError('Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
@@ -476,7 +518,7 @@ class BN(Layer):
 
 class Flatten(Layer):
     '''
-    Represents a flatten layer
+    Flatten layer
     takes a tensor and converts it to a matrix
     This layer usually acts as an interface between conv layer and dense layer
     '''
@@ -493,11 +535,11 @@ class Flatten(Layer):
         Performs a forward pass through the Flatten Layer
 
         Args:
-            X (numpy.ndarray)   : Input array
-            train (bool)        : No effect of this layer
+            :X (numpy.ndarray): Input array
+            :train (bool): No effect of this layer
 
         Returns:
-            Out (numpy.ndarray) : Output after flattening
+            :Out (numpy.ndarray): Output after flattening
         '''
         self.shape = X.shape
         out = X.reshape(self.shape[0],-1)
@@ -508,18 +550,33 @@ class Flatten(Layer):
         Performs a backward pass through the BN_mean Layer
 
         Args:
-            dY (numpy.ndarray)   : Output gradient backpropagated from layers in the front
+            :dY (numpy.ndarray): Output gradient backpropagated from layers in the front
 
         Returns:
-            dX (numpy.ndarray)   : Input gradient after reshaping dY
-            var_grad_list (list) : [], since layer is not trainable
+            :dX (numpy.ndarray): Input gradient after reshaping dY
+            :var_grad_list (list): [], since layer is not trainable
         '''
         dX = dY.reshape(self.shape)
         return dX,[]
 
 class Conv2D(Layer):
     '''
-    Represents a 2D Convolutional Layer
+    2D Convolutional Layer
+
+    Initialization:
+        :W: initialized with either Xavier or He initialization
+        :b: initialized to zero
+
+    Args:
+        :outChannels (int):   Number of output channels
+        :inChannels (int):   size of output requred
+        :filter_size (int):   Size of each kernel (filter_size x filter_size)
+        :stride (int):   Stride to be used
+        :padding (int):   Padding to be used for convolution
+        :init_method (str):   initialization method to be used for Weights
+        :trainable (bool):
+            :False: parameters of the layer are frozed
+            :True: parameters are updated during optimizer step
     '''
     def __init__(self,outChannels,inChannels,filter_size,stride=1,padding=0,*,init_method='Xavier',trainable=False):
         '''
@@ -601,11 +658,11 @@ class Conv2D(Layer):
         Convolves Inputs with the Weights
 
         Args:
-            X (numpy.ndarray)   : Input array
-            train (bool)        : Set true to cache X and X_col
+            :X (numpy.ndarray): Input array
+            :train (bool): Set true to cache X and X_col
 
         Returns:
-            Out (numpy.ndarray) : Output after Convolution
+            :Out (numpy.ndarray): Output after Convolution
         '''
         output,X_col = self._convolve_(Input = X,kernel = self.W,bias = self.b,padding = self.padding, stride = self.stride)
         if train:
@@ -617,11 +674,13 @@ class Conv2D(Layer):
         Performs a backward pass through the Conv2D Layer
 
         Args:
-            dY (numpy.ndarray)  : Output gradient backpropagated from layers in the front
+            :dY (numpy.ndarray): Output gradient backpropagated from layers in the front
 
         Returns:
-            dX (numpy.ndarray)  : Input gradient after backpropagating dY through Conv2D
-            var_grad_list (list): If Layer is trainable contains (W,dW) and (b,db) otherwise []
+            :dX (numpy.ndarray): Input gradient after backpropagating dY through Conv2D
+            :var_grad_list (list):
+                :trainable = True: [(W,dW), (b,db)]
+                :trainable = False: [ ]
         '''
         if self.cache_in is None:
             raise RuntimeError('Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
@@ -651,7 +710,24 @@ class Conv2D(Layer):
 
 class dilated_Conv2D(Conv2D):
     '''
-    Represents a 2D Dilated Convolutional Layer
+    2D Dilated Convolutional Layer
+
+    Initialization:
+        :W: initialized with either Xavier or He initialization
+        :b: initialized to zero
+        :dm: dilation matrix that is used to dilated the kernels
+
+    Args:
+        :outChannels (int):   Number of output channels
+        :inChannels (int):   size of output requred
+        :filter_size (int):   Size of each kernel (filter_size x filter_size)
+        :dilation (int):   Dilation factor to be used
+        :stride (int):   Stride to be used
+        :padding (int):   Padding to be used for convolution
+        :init_method (str):   initialization method to be used for Weights
+        :trainable (bool):
+            :False: parameters of the layer are frozed
+            :True: parameters are updated during optimizer step
     '''
     def __init__(self,outChannels,inChannels,filter_size,dilation=2,stride=1,padding=0,*,init_method='Xavier',trainable=False):
         '''
@@ -704,11 +780,11 @@ class dilated_Conv2D(Conv2D):
         Convolves Inputs with the kernels after dilation
 
         Args:
-            X (numpy.ndarray)      :   Input array
-            train (bool)           :   Set true to cache X and X_col
+            :X (numpy.ndarray):   Input array
+            :train (bool):   Set true to cache X and X_col
 
         Returns:
-            Output (numpy.ndarray) :   Output after Convolution
+            :Output (numpy.ndarray):   Output after Convolution
         '''
         # dilate the kernels using dilation matrix
         self.W_exp = self.dm@self.W@self.dm.T
@@ -722,11 +798,13 @@ class dilated_Conv2D(Conv2D):
         Performs a backward pass through the dilated Conv2D Layer
 
         Args:
-            dY (numpy.ndarray)  : Output gradient backpropagated from layers in the front
+            :dY (numpy.ndarray): Output gradient backpropagated from layers in the front
 
         Returns:
-            dX (numpy.ndarray)  : Input gradient after backpropagating dY through dilated Conv2D
-            var_grad_list (list): If Layer is trainable contains (W,dW) and (b,db) otherwise []
+            :dX (numpy.ndarray): Input gradient after backpropagating dY through dilated Conv2D
+            :var_grad_list (list):
+                :trainable = True: [(W,dW), (b,db)]
+                :trainable = False: [ ]
         '''
         if self.cache_in is None:
             raise RuntimeError('Gradient cache not defined. When training the train argument must be set to true in the forward pass.')

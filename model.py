@@ -10,8 +10,6 @@ class Model(object):
     def __init__(self):
         '''
         Returns a new empty neural network with no layers or loss
-        Args:
-            learning_rate (float): Learning rate to be used for minibatch SGD
         '''
         self.layers = []
         self.loss = None
@@ -22,7 +20,7 @@ class Model(object):
         The input to this layer will be the output of the last added layer
         or the initial inputs to the networks if this is the first layer added.
         Args:
-            layer (Layer): An instantiation of a class that extends Layer
+            :layer (Layer): Layer to be added to the model
         '''
         assert isinstance(layer,Layer)
         self.layers.append(layer)
@@ -31,7 +29,7 @@ class Model(object):
         '''
         Sets the loss fuction that the network uses for training
         Args:
-            loss (Loss): An instantiation of a class that extends Loss
+            :loss (Loss): Loss function to be used
         '''
         assert isinstance(loss,Loss)
         self.loss = loss
@@ -40,9 +38,9 @@ class Model(object):
         '''
         Calculates the output of the network for the given inputs.
         Args:
-            inputs (numpy.ndarray): Inputs to the network
+            :inputs (numpy.ndarray): Inputs to the network
         Returns:
-            (numpy.ndarray): Outputs of the last layer of the network.
+            :output (numpy.ndarray): Outputs of the last layer of the network.
         '''
         output = inputs
         for layer in self.layers:
@@ -54,11 +52,11 @@ class Model(object):
         Calculates the loss of the network for the given inputs and labels
         returns the list of tuples with variables and their curresponding gradients
         Args:
-            inputs (numpy.ndarray): Inputs to the network
-            labels (numpy.ndarray): Int representation of the labels (eg. the third class is represented by 2)
+            :inputs (numpy.ndarray): Inputs to the network
+            :labels (numpy.ndarray): Int representation of the labels (eg. the third class is represented by 2)
         Returns:
-            (float): The loss before updating the network
-            (list of tuples): variables and their gradients
+            :loss (float): The loss before updating the network
+            :vars_and_grads (list of tuples): variables and their gradients
         '''
         vars_and_grads = []
 
@@ -74,14 +72,40 @@ class Model(object):
         return loss, vars_and_grads
 
     def set_optimizer(self,optimizer):
+        '''
+        Sets the optmizier to be used
+
+        Args:
+            :optimizer (Optimizer): Optimizer to be used
+        '''
         assert isinstance(optimizer,Optimizer)
         self.optimizer = optimizer
 
     def set_iterator(self,iterator):
+        '''
+        Sets up the iterator
+
+        Args:
+            :iterator (Iterator): Iterator to be used
+        '''
         assert isinstance(iterator,Iterator)
         self.iterator = iterator
 
     def fit(self,Data,Labels,epochs=1,*,verbose=True,**kwargs):
+        '''
+        Trains the model on the provided Data and Labels
+
+        Updates the model parameters which are trainable
+
+        Args:
+            :Data (numpy.ndarray): Data to fit on
+            :Labels (numpy.ndarray): Labels for the Data
+            :epochs (int): Number of epochs to train for
+            :verbose (bool): Set to True to print progress, default True
+        Kwargs:
+            :optimizer(optimizer): Optimizer to be used
+            :iterator (Iterator): Iterator to be used
+        '''
         allowed_kwargs = {'optimizer','iterator'}
         for k in kwargs:
             if k not in allowed_kwargs:
@@ -109,6 +133,13 @@ class Model(object):
                 print(prnt_tmplt.format(epoch, average_loss))
 
     def score(self,Data,Labels):
+        '''
+        Return loss and accuracy of a model on Data and Labels passed
+
+        Args:
+            :Data (numpy.ndarray): Data to find performance on
+            :Labels (numpy.ndarray): Labels to find performance on
+        '''
         assert hasattr(self,"loss"),'loss function not defined please set a loss function to score with'
         assert Data.shape[0]==Labels.shape[0],'Number of elements in data should same as number of elements in Label'
         scores = self.predict(Data)

@@ -62,9 +62,9 @@ class SGD(Optimizer):
     '''
     def __init__(self,lr=0.01,momentum=0,decay=0,nestrov=False,**kwargs):
         super(SGD,self).__init__(**kwargs)
-        assert decay > = 0,"-ve decay not valid"
-        assert momentum>=0,"-ve momentum not valid"
-        assert momentum<1,f"momentum should be <1, currently {momentum}"
+        assert decay >= 0,"-ve decay not valid"
+        assert momentum >=0,"-ve momentum not valid"
+        assert momentum <1,f"momentum should be <1, currently {momentum}"
         self.lr = lr
         self.momentum = momentum
         self.decay = decay
