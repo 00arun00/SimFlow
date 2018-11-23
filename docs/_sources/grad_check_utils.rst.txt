@@ -1,7 +1,0 @@
-grad\_check\_utils module
-=========================
-
-.. automodule:: grad_check_utils
-    :members:
-    :undoc-members:
-    :show-inheritance:

@@ -1,7 +1,0 @@
-im2col module
-=============
-
-.. automodule:: im2col
-    :members:
-    :undoc-members:
-    :show-inheritance:

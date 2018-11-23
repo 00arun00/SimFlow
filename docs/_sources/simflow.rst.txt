@@ -1,7 +1,0 @@
-simflow module
-==============
-
-.. automodule:: simflow
-    :members:
-    :undoc-members:
-    :show-inheritance:
