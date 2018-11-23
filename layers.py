@@ -60,12 +60,6 @@ class Layer(object):
         else:
           raise NotImplementedError('This method not currently supported')
 
-    def __repr__(self):
-        if hasattr(self,l_name):
-            return f'{self.l_name} layer'
-        else:
-            return f'Layer'
-
     def get_params(self):
         '''
         Returns the list of numpy array of weights
@@ -86,10 +80,25 @@ class Layer(object):
         old_params = self.get_params()
         assert len(old_params) == len(params),"length mismatch"
         assert all(params[i].shape == old_params[i].shape for i in range(len(old_params))),"shape missmatch"
-        for (op,p) in zip(old_params,params):
-            op = p
+        self.params = params.copy()
 
+    def set_config(self,config):
+        self.__init__(self,*config)
 
+    def save_layer(self):
+        return [('conf:',self.get_config()),('params:',self.get_params())]
+
+    def _get_config_(self):
+        return {}
+
+    def __repr__(self):
+        if hasattr(self,'l_name'):
+            return f'{self.l_name} layer'
+        else:
+            return f'Layer'
+
+    def __call__(self,X,train=True):
+        return self.forward(X,train)
 
 class Dense(Layer):
     '''
@@ -184,6 +193,18 @@ class Dense(Layer):
 
     def __repr__(self):
         return f'Dense Layer with shape {self.W.shape}'
+
+    def _get_config_(self):
+        '''
+        returns the dict of params required to recreate the layer
+        '''
+        input_dim,output_dim = self.W.shape
+        config = {"input_dim":input_dim,
+                    "output_dim":output_dim,
+                    "init_method":self.init_method,
+                    'trainable':self.trainable}
+        base_config = super(Dense,self)._get_config_()
+        return dict(list(base_config.items())+list(config.items()))
 
 #adding aliases
 Linear = Dense
@@ -371,6 +392,7 @@ class BN_mean(Layer):
                                 if set to True parameters are updated during optimizer step
         '''
         assert isinstance(elr,float) and (elr>0 and elr<1), f'should be float value between 0 and 1 but given {elr}'
+        self.dim = dim
         self.beta = np.zeros((1,int(np.prod(dim))))
         self.cache_in = None
         self.mean_learned = np.zeros_like(self.beta)
@@ -429,6 +451,15 @@ class BN_mean(Layer):
         else:
             return dX,[]
 
+    def _get_config_(self):
+        '''
+        returns the dict of params required to recreate the layer
+        '''
+        config = {"dim":self.dim,"elr":self.elr,"trainable":self.trainable}
+        base_config = super(BN_mean,self)._get_config_()
+        return dict(list(base_config.items())+list(config.items()))
+
+
 class BN(Layer):
     '''
     Batch normalization  Layer (Full)
@@ -468,6 +499,7 @@ class BN(Layer):
 
         '''
         assert isinstance(elr,float) and (elr>0 and elr<1), f'should be float value between 0 and 1 but given {elr}'
+        self.dim = dim
         self.beta = np.zeros((1,int(np.prod(dim))))
         self.gamma = np.zeros((1,int(np.prod(dim))))
         self.cache_in = None
@@ -547,6 +579,15 @@ class BN(Layer):
           return dX, [(self.gamma,dgamma),(self.beta, dbeta)]
         else:
             return dX,[]
+
+    def _get_config_(self):
+        '''
+        returns the dict of params required to recreate the layer
+        '''
+        config = {"dim":self.dim,"elr":self.elr,"trainable":self.trainable}
+        base_config = super(BN,self)._get_config_()
+        return dict(list(base_config.items())+list(config.items()))
+
 
 class Flatten(Layer):
     '''
@@ -634,8 +675,8 @@ class Conv2D(Layer):
         assert isinstance(padding,int) and padding >= 0
 
         self.cache_in = None
-        W_size = (outChannels,inChannels,filter_size,filter_size) #currently supports only square kernels
-        self.W = np.random.rand(*W_size)
+        self.W_size = (outChannels,inChannels,filter_size,filter_size) #currently supports only square kernels
+        self.W = np.random.rand(*self.W_size)
         self.W *= self._initializer_(self.W,init_method)
         self.b = np.zeros((outChannels,1))
         self.stride = stride
@@ -643,47 +684,6 @@ class Conv2D(Layer):
         self.trainable = trainable
         self.l_name = 'Conv2D'
         self.params = [self.W,self.b]
-
-    def __repr__(self):
-        return f'Conv2D Layer with {self.W.shape[0]} number of filters of shape {self.W.Shape[1:]}, Stide = {self.stride}, padding = {self.padding} Trainable = {self.trainable}'
-
-    @staticmethod
-    def _convolve_(Input,kernel,bias=0,padding=0,stride=1):
-        '''
-        2D Convolution function:
-        Convolves Inputs with the given kernel
-
-        Args:
-            Input (numpy.ndarray)     :    Input to be Convolved over
-            kernel (numpy.ndarray)    :    Kernel to be Convoled with
-            bias (numpy.ndarray)      :    bias optional, set to zero unless needed
-            padding (int)             :    padding to be used
-            stride (int)              :    stride to used
-
-        Returns:
-            out (numpy.ndarray)       :    Output after convolution
-            Input_col (numpy.ndarray) :    retiled and stacked input
-        '''
-        assert len(Input.shape)==4 and len(kernel.shape)==4
-        n_x, d_x, h_x, w_x = Input.shape
-        n_filter, d_filter, h_filter, w_filter = kernel.shape
-        assert d_x == d_filter,"inputs not alligned for standard convolution"
-
-        #check for validity of convolution
-        h_out = (h_x - h_filter + 2 * padding) / stride + 1
-        w_out = (w_x - w_filter + 2 * padding) / stride + 1
-
-        if not h_out.is_integer() or not w_out.is_integer():
-            raise Exception('Invalid output dimension!')
-
-        h_out, w_out = int(h_out), int(w_out)
-
-        Input_col = im2col_indices(Input, h_filter, w_filter, padding=padding, stride=stride)
-        kernel_row = kernel.reshape(n_filter, -1)
-        out = kernel_row @ Input_col + bias
-        out = out.reshape(n_filter, h_out, w_out, n_x)
-        out = out.transpose(3, 0, 1, 2)
-        return out,Input_col
 
 
     def forward(self, X, train=True):
@@ -742,6 +742,60 @@ class Conv2D(Layer):
         else:
             return dX,[]
 
+    def __repr__(self):
+        return f'Conv2D Layer with {self.W.shape[0]} number of filters of shape {self.W.Shape[1:]}, Stide = {self.stride}, padding = {self.padding} Trainable = {self.trainable}'
+
+    @staticmethod
+    def _convolve_(Input,kernel,bias=0,padding=0,stride=1):
+        '''
+        2D Convolution function:
+        Convolves Inputs with the given kernel
+
+        Args:
+            Input (numpy.ndarray)     :    Input to be Convolved over
+            kernel (numpy.ndarray)    :    Kernel to be Convoled with
+            bias (numpy.ndarray)      :    bias optional, set to zero unless needed
+            padding (int)             :    padding to be used
+            stride (int)              :    stride to used
+
+        Returns:
+            out (numpy.ndarray)       :    Output after convolution
+            Input_col (numpy.ndarray) :    retiled and stacked input
+        '''
+        assert len(Input.shape)==4 and len(kernel.shape)==4
+        n_x, d_x, h_x, w_x = Input.shape
+        n_filter, d_filter, h_filter, w_filter = kernel.shape
+        assert d_x == d_filter,"inputs not alligned for standard convolution"
+
+        #check for validity of convolution
+        h_out = (h_x - h_filter + 2 * padding) / stride + 1
+        w_out = (w_x - w_filter + 2 * padding) / stride + 1
+
+        if not h_out.is_integer() or not w_out.is_integer():
+            raise Exception('Invalid output dimension!')
+
+        h_out, w_out = int(h_out), int(w_out)
+
+        Input_col = im2col_indices(Input, h_filter, w_filter, padding=padding, stride=stride)
+        kernel_row = kernel.reshape(n_filter, -1)
+        out = kernel_row @ Input_col + bias
+        out = out.reshape(n_filter, h_out, w_out, n_x)
+        out = out.transpose(3, 0, 1, 2)
+        return out,Input_col
+
+    def _get_config_(self):
+        '''
+        returns the dict of params required to recreate the layer
+        '''
+        stride=1,padding=0,*,init_method='Xavier',trainable=False
+        outChannels,inChannels,filter_size,_ = self.W.shape
+        config = {"outChannels":outChannels,"inChannels":inChannels,
+                    "stride":self.stride,"padding":self.padding,
+                    "filter_size":filter_size,"trainable":self.trainable,
+                    "trainable":self.trainable}
+        base_config = super(Conv2D,self)._get_config_()
+        return dict(list(base_config.items())+list(config.items()))
+
 class dilated_Conv2D(Conv2D):
     '''
     2D Dilated Convolutional Layer
@@ -786,27 +840,6 @@ class dilated_Conv2D(Conv2D):
         self.dilation = dilation #currently supports only symmetical dilations
         self.dm = self._create_dilation_mat_()
         self.l_name = 'dilated_Conv2D'
-    def __repr__(self):
-        return f'Conv2D Layer with {self.W.shape[0]} dilation = {dilation} number of filters of shape {self.W.Shape[1:]}, Stide = {self.stride}, padding = {self.padding} Trainable = {self.trainable}'
-
-    def _create_dilation_mat_(self):
-        '''
-        private:
-        generates a dilation matrix that is used to dilate the kernel
-
-        Returns:
-            dilation_mat (numpy.ndarray) : Matrix that is used to dilate the kernel
-        '''
-        I = np.eye(self.W.shape[2])
-        z = np.zeros((1,self.W.shape[2]))
-        res =[]
-        for i in range(self.W.shape[2]):
-            res.append(I[i])
-            for k in range(self.dilation-1):
-                res.append(z)
-        res = np.row_stack(res)
-        dilation_mat = res[:-self.dilation+1]
-        return dilation_mat
 
     def forward(self, X, train=True):
         '''
@@ -865,3 +898,35 @@ class dilated_Conv2D(Conv2D):
             return dX, [(self.W,dW),(self.b,db)]
         else:
             return dX,[]
+
+    def _create_dilation_mat_(self):
+        '''
+        private:
+        generates a dilation matrix that is used to dilate the kernel
+
+        Returns:
+            dilation_mat (numpy.ndarray) : Matrix that is used to dilate the kernel
+        '''
+        I = np.eye(self.W.shape[2])
+        z = np.zeros((1,self.W.shape[2]))
+        res =[]
+        for i in range(self.W.shape[2]):
+            res.append(I[i])
+            for k in range(self.dilation-1):
+                res.append(z)
+        res = np.row_stack(res)
+        dilation_mat = res[:-self.dilation+1]
+        return dilation_mat
+
+    def _get_config_(self):
+        '''
+        returns the dict of params required to recreate the layer
+        '''
+        stride=1,padding=0,*,init_method='Xavier',trainable=False
+        outChannels,inChannels,filter_size,_ = self.W.shape
+        config = {"dilation":self.dilation}
+        base_config = super(Conv2D,self)._get_config_()
+        return dict(list(base_config.items())+list(config.items()))
+
+        def __repr__(self):
+            return f'Conv2D Layer with {self.W.shape[0]} dilation = {dilation} number of filters of shape {self.W.Shape[1:]}, Stide = {self.stride}, padding = {self.padding} Trainable = {self.trainable}'

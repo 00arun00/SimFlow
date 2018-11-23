@@ -49,6 +49,18 @@ class Model(object):
             param_list+=[(layer.l_name,layer.get_params())]
         return param_list
 
+    def set_params(self,params):
+        '''
+        Sets the params of a layer with a new params
+
+        Ags:
+            :params (list of numpy.ndarray): new weights
+        '''
+        old_params = self.get_params()
+        assert len(old_params)==len(params),'Length missmatch'
+        assert all((new_param[0]==old_param[0] and all(n.shape==o.shape) for n,o in zip(new_param,old_param)) for (new_param,old_param) in zip(params,old_params)),'Structure missmatch'
+        for (new_param,layer) in zip(params,self.layers):
+            layer.set_params(new_param[1])
 
 
     def add_layer(self, layer):
