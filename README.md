@@ -7,14 +7,23 @@ Link to official Documentation : https://00arun00.github.io/SimFlow/
 
 #### Layers:
 
-  - Dense
+###### Actication Functions:
   - ReLU
   - Sigmoid
   - Tanh
-  - BN_mean (mean only batch norm)
-  - Batch Normalization
+  - LeakyReLU
+  - Softplus
+  - exp
+
+###### Convolutional Layers:
   - Convolutional Neural nets
   - Dilated Convolutional Layer
+  
+###### Other Layers:
+  - Dense
+  - BN_mean (mean only batch norm)
+  - Batch Normalization
+  
   
 #### Losses:
 
@@ -25,6 +34,10 @@ Link to official Documentation : https://00arun00.github.io/SimFlow/
   - SGD
   - Momentum
   - Nestrov Momentum
+  - RMSProp
+  - Adagrad
+  - Adadelta
+  - Adam
 
 #### Iterators:
 
@@ -87,7 +100,6 @@ print("Test Accuracy: ",net.score(Data['test'],Labels['test'])[1])
 
 - dropout
 - maxpool / average pool
-- LeakyReLU
 - PReLU
 
 #### Regularizers:
@@ -98,8 +110,8 @@ print("Test Accuracy: ",net.score(Data['test'],Labels['test'])[1])
 
 #### Optimizers
 
-- Adam
-- RMSprop
+- Nadam
+- Adamax
 
 ### Testing Features
 
