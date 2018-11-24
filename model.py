@@ -196,7 +196,7 @@ class Model(object):
         assert hasattr(self,"loss"),'loss function not defined please set a loss function to score with'
         assert Data.shape[0]==Labels.shape[0],'Number of elements in data should same as number of elements in Label'
         scores = self.predict(Data)
-        loss, _ = self.loss.get_loss(Data, Labels)
+        loss, _ = self.loss.get_loss(scores, Labels)
         pred = np.argmax(scores,axis=1)
         correct = np.sum(pred==Labels)
         n_inp = Data.shape[0]
