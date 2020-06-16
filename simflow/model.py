@@ -1,8 +1,9 @@
+import numpy as np
+
 from simflow.optimizers import Optimizer
 from simflow.iterators import Iterator
 from simflow.layers import Layer
 from simflow.losses import Loss
-import numpy as np
 
 
 class Model(object):
@@ -24,7 +25,8 @@ class Model(object):
         # currently not the most elegant implementation
         dash = "-"*75
         print(dash)
-        print('{:<30s}|{:22s}|{:20s}'.format("Name", "Trainable Parameters", "Total Parameters"))
+        print('{:<30s}|{:22s}|{:20s}'.format("Name", "Trainable Parameters",
+                                             "Total Parameters"))
         print(dash)
         total_params = 0
         total_trainable_params = 0
@@ -36,11 +38,15 @@ class Model(object):
                 param_size += np.prod(p.shape)
                 if layer.trainable:
                     trainable_param_size += np.prod(p.shape)
-            print('{:<30s}|{:>22d}|{:>20d}'.format(layer.l_name, trainable_param_size, param_size))
+            print('{:<30s}|{:>22d}|{:>20d}'.format(layer.l_name,
+                                                   trainable_param_size,
+                                                   param_size))
             total_params += param_size
             total_trainable_params += trainable_param_size
         print(dash)
-        print('{:<30s}|{:>22d}|{:>20d}'.format("Total", total_trainable_params, total_params))
+        print('{:<30s}|{:>22d}|{:>20d}'.format("Total",
+                                               total_trainable_params,
+                                               total_params))
         print(dash)
 
     def get_params(self):
@@ -61,8 +67,10 @@ class Model(object):
         '''
         old_params = self.get_params()
         assert len(old_params) == len(params), 'Length missmatch'
-        assert all((new_param[0] == old_param[0] and all(n.shape == o.shape) for n, o in zip(
-            new_param, old_param)) for (new_param, old_param) in zip(params, old_params)), 'Structure missmatch'
+        assert all((new_param[0] == old_param[0] and all(n.shape == o.shape)
+                    for n, o in zip(new_param, old_param))
+                   for (new_param, old_param)
+                   in zip(params, old_params)), 'Structure missmatch'
         for (new_param, layer) in zip(params, self.layers):
             layer.set_params(new_param[1])
 
@@ -105,11 +113,11 @@ class Model(object):
     def _forward_backward_(self, inputs, labels):
         '''
         Calculates the loss of the network for the given inputs and labels
-        returns the list of tuples with variables and their curresponding gradients
 
         Args:
             :inputs (numpy.ndarray): Inputs to the network
-            :labels (numpy.ndarray): Int representation of the labels (eg. the third class is represented by 2)
+            :labels (numpy.ndarray): Int representation of the labels
+                (eg. the third class is represented by 2)
         Returns:
             :loss (float): The loss before updating the network
             :vars_and_grads (list of tuples): variables and their gradients
@@ -167,11 +175,11 @@ class Model(object):
             if k not in allowed_kwargs:
                 raise TypeError('Unexpected keyword argument '
                                 'passed to fit: ' + str(k))
-            else:
-                if k == 'optimizer':
-                    self.set_optimizer(kwargs[k])
-                if k == 'iterator':
-                    self.set_iterator(kwargs[k])
+
+            if k == 'optimizer':
+                self.set_optimizer(kwargs[k])
+            if k == 'iterator':
+                self.set_iterator(kwargs[k])
         # self.__dict__.update(kwargs)
         if not hasattr(self, 'optimizer'):
             raise NameError('Optimizer not defined')
