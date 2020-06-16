@@ -1,75 +1,71 @@
 import numpy as np
+from abc import ABC, abstractmethod
 
 
-class Layer(object):
+class Layer(ABC):
     '''
     Abstract class representing a neural network layer
     '''
 
+    @abstractmethod
     def forward(self, X, train=True):
         '''
         Calculates a forward pass through the layer.
 
         Args:
-            :X (numpy.ndarray):   Input to the layer with dimensions (batch_size, input_size)
-            :train (bool):   If true caches values required for backward function
+            X (numpy.ndarray): Input  (batch_size, input_size)
+            train (bool): If true caches values required for backward function
 
         Returns:
-            :Out (numpy.ndarray):   Output of the layer with dimensions (batch_size, output_size)
+            Out (numpy.ndarray): Output (batch_size, output_size)
         '''
-        raise NotImplementedError('This is an abstract class')
 
+    @abstractmethod
     def backward(self, dY):
         '''
         Calculates a backward pass through the layer.
 
         Args:
-            :dY (numpy.ndarray):   The gradient of the output with dimensions (batch_size, output_size)
+            dY (numpy.ndarray): Output grad (batch_size, output_size)
 
         Returns:
-            :dX (numpy.ndarray):   Gradient of the input (batch_size, output_size)
-            :var_grad_list (list):   List of tuples in the form (variable_pointer, variable_grad)
+            dX (numpy.ndarray): Gradient of the input (batch_size, output_size)
+            var_grad_list (List[Tuple[np.array]]): variables and grads
         '''
-        raise NotImplementedError('This is an abstract class')
 
-    def _initializer_(self, W, init_method):
+    @staticmethod
+    def _initializer_(W, init_method):
         """
-        Initializes the parameter passes as argument using Xavier of He initialization
+
+        Initializes the parameter passes as argument using
+        Xavier or He initialization
 
         Args:
             W (numpy.ndarray): Parameter to be initialized
             init_method (str): Method to initialize the parameter
 
         """
-        if init_method == 'Xavier':
-            if len(W.shape) == 2:  # linear layer
-                input_dim, output_dim = W.shape
+        init_method = init_method.lower()
+        if init_method not in ['xavier', 'he']:
+            raise NotImplementedError('method not currently supported')
+
+        if len(W.shape) == 2:  # linear layer
+            input_dim, output_dim = W.shape
+            if init_method == 'xavier':
                 return np.sqrt(2.0/(input_dim+output_dim))
-            elif len(W.shape) == 4:  # convolutional layer
-                n_filter, d_filter, h_filter, w_filter = W.shape
-                return np.sqrt(2.0/(h_filter*w_filter*d_filter))
-            else:
-                raise NotImplementedError('This W size is not defined')
-        elif init_method == 'He':
-            if len(W.shape) == 2:  # linear layer
-                input_dim, output_dim = W.shape
+            if init_method == 'he':
                 return np.sqrt(2.0/(input_dim))
-            elif len(W.shape) == 4:  # convolutional layer
-                n_filter, d_filter, h_filter, w_filter = W.shape
-                return np.sqrt(2.0/(h_filter*w_filter*d_filter))
-            else:
-                raise NotImplementedError('This W size is not defined')
-        else:
-            raise NotImplementedError('This method not currently supported')
+        if len(W.shape) == 4:  # convolutional layer
+            n_filter, d_filter, h_filter, w_filter = W.shape
+            return np.sqrt(2.0/(h_filter*w_filter*d_filter))
+
+        raise NotImplementedError('This W size is not defined')
 
     def get_params(self):
         '''
         Returns the list of numpy array of weights
         '''
-        if hasattr(self, 'params'):
-            return self.params
-        else:
-            raise ValueError('Params not defined')
+        return self.params
 
     def set_params(self, params):
         '''
@@ -86,19 +82,18 @@ class Layer(object):
         self.params = params.copy()
 
     def set_config(self, config):
-        self.__init__(self, *config)
+        self.__init__(*config)
 
     def save_layer(self):
-        return [('conf:', self.get_config()), ('params:', self.get_params())]
+        return (('conf:', self.get_config()), ('params:', self.get_params()))
 
-    def _get_config_(self):
+    def get_config(self):
         return {}
 
     def __repr__(self):
         if hasattr(self, 'l_name'):
             return f'{self.l_name} layer'
-        else:
-            return f'Layer'
+        return f'Layer'
 
     def __call__(self, X, train=True):
         return self.forward(X, train)

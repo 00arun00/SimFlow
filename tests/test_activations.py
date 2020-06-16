@@ -1,5 +1,7 @@
 import numpy as np
-from simflow.layers.activations import ReLU, LeakyReLU, Softplus, exp
+from simflow.layers.activations import (
+    ReLU, LeakyReLU, Softplus, exp, Sigmoid, Tanh
+)
 from simflow.utils.grad_check_utils import numerical_gradient_array
 import unittest
 
@@ -24,6 +26,10 @@ class TestActivations(unittest.TestCase):
 
         assert np.allclose(dx, dx_num, atol=self.eps)
 
+        with self.assertRaises(RuntimeError):
+            layer2 = Layer(trainable=False)
+            layer2.backward(self.dout)
+
     def test_relu_back_prop(self):
         self.helper_grad_check(ReLU)
 
@@ -35,3 +41,9 @@ class TestActivations(unittest.TestCase):
 
     def test_exp_back_prop(self):
         self.helper_grad_check(exp)
+
+    def test_sigmoid_back_prop(self):
+        self.helper_grad_check(Sigmoid)
+
+    def test_tanh_back_prop(self):
+        self.helper_grad_check(Tanh)
