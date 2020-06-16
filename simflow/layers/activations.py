@@ -1,5 +1,6 @@
-from Class_Layer import Layer
+from simflow.layers.layer_class import Layer
 import numpy as np
+
 
 class ReLU(Layer):
     '''
@@ -7,7 +8,7 @@ class ReLU(Layer):
     Represent a nonlinear transformation Y = max(0,X)
     '''
 
-    def __init__(self,*,trainable=True):
+    def __init__(self, *, trainable=True):
         '''
         Initialization :
             Does nothing since nothing to initialize
@@ -28,7 +29,7 @@ class ReLU(Layer):
         Returns:
             :Out (numpy.ndarray): Output after applying transformation Y = max(0,X)
         '''
-        out = np.maximum(X,0)
+        out = np.maximum(X, 0)
         if train:
             self.cache_in = X
         return out
@@ -45,9 +46,11 @@ class ReLU(Layer):
             :var_grad_list (list): [], since it has no parameter to be learned
         '''
         if self.cache_in is None:
-            raise RuntimeError('Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
-        dX = dY*(self.cache_in>=0)
-        return dX ,[]
+            raise RuntimeError(
+                'Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
+        dX = dY*(self.cache_in >= 0)
+        return dX, []
+
 
 # adding aliases
 relu = ReLU
@@ -59,7 +62,7 @@ class Sigmoid(Layer):
     Represent a nonlinear transformation Y = 1/(1+e^(-X))
     '''
 
-    def __init__(self,*,trainable=True):
+    def __init__(self, *, trainable=True):
         '''
         Initialization:
             Does nothing since nothing to initialize
@@ -97,17 +100,20 @@ class Sigmoid(Layer):
             :var_grad_list (list): [], since it has no parameter to be learned
         '''
         if self.cache_in is None:
-            raise RuntimeError('Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
+            raise RuntimeError(
+                'Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
         out = self.cache_in
         dX = dY*(out*(1-out))
-        return dX ,[]
+        return dX, []
+
 
 class Tanh(Layer):
     '''
     Tanh layer
     Represent a nonlinear transformation Y = (1-e^(-2X))/(1+e^(-2X)) {tanh}
     '''
-    def __init__(self,*,trainable=True):
+
+    def __init__(self, *, trainable=True):
         '''
         Initialization :
             Does nothing since nothing to initialize
@@ -146,10 +152,12 @@ class Tanh(Layer):
         '''
 
         if self.cache_in is None:
-            raise RuntimeError('Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
+            raise RuntimeError(
+                'Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
         out = self.cache_in
         dX = dY*(1-out**2)
-        return dX ,[]
+        return dX, []
+
 
 class LeakyReLU(Layer):
     '''
@@ -159,7 +167,8 @@ class LeakyReLU(Layer):
     Args:
         :alpha (float): Leakiness parameter
     '''
-    def __init__(self,alpha=0.1,*,trainable=True):
+
+    def __init__(self, alpha=0.1, *, trainable=True):
         '''
         Initialization :
             initialize the leakiness parameter
@@ -181,7 +190,7 @@ class LeakyReLU(Layer):
         Returns:
             :Out (numpy.ndarray): Output after applying transformation Y = LeakyReLU(X)
         '''
-        out = np.maximum(self.alpha*X,X)
+        out = np.maximum(self.alpha*X, X)
         if train:
             self.cache_in = X
         return out
@@ -199,18 +208,20 @@ class LeakyReLU(Layer):
         '''
 
         if self.cache_in is None:
-            raise RuntimeError('Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
+            raise RuntimeError(
+                'Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
         X = self.cache_in
-        grad = 1*(X>0)+self.alpha*(X<=0)
+        grad = 1*(X > 0)+self.alpha*(X <= 0)
         dX = dY*grad
-        return dX ,[]
+        return dX, []
 
 
 class Softplus(Layer):
     '''
     Represent a nonlinear transformation Y = log(1+exp(X))
     '''
-    def __init__(self,*,trainable=True):
+
+    def __init__(self, *, trainable=True):
         '''
         Initialization :
             Nothing to initialize
@@ -250,17 +261,20 @@ class Softplus(Layer):
         '''
 
         if self.cache_in is None:
-            raise RuntimeError('Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
+            raise RuntimeError(
+                'Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
         X = self.cache_in
         grad = 1/(1+np.exp(-X))
         dX = dY*grad
-        return dX ,[]
+        return dX, []
+
 
 class exp(Layer):
     '''
     Represent a nonlinear transformation Y = exp(X)
     '''
-    def __init__(self,*,trainable=True):
+
+    def __init__(self, *, trainable=True):
         '''
         Initialization :
             Nothing to initialize
@@ -300,8 +314,9 @@ class exp(Layer):
         '''
 
         if self.cache_in is None:
-            raise RuntimeError('Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
+            raise RuntimeError(
+                'Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
         X = self.cache_in
         grad = np.exp(X)
         dX = dY*grad
-        return dX ,[]
+        return dX, []

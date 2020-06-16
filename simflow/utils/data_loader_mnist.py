@@ -1,4 +1,6 @@
 import numpy as np
+
+
 def load_normalized_mnist_data_flat():
     '''
     Loads and normalizes the MNIST data. Reads the data from
@@ -28,7 +30,7 @@ def load_normalized_mnist_data_flat():
             os.mkdir('data')
         except:
             pass
-        wget.download(url,'data/mnist_train.csv')
+        wget.download(url, 'data/mnist_train.csv')
         print('Now loading data please wait will take around a minute')
 
         data = np.loadtxt('data/mnist_train.csv', dtype=int, delimiter=',')
@@ -46,12 +48,10 @@ def load_normalized_mnist_data_flat():
             os.mkdir('data')
         except:
             pass
-        wget.download(url,'data/mnist_test.csv')
+        wget.download(url, 'data/mnist_test.csv')
         print('Now loading data please wait will take around a minute')
 
         test_data = np.loadtxt('data/mnist_test.csv', dtype=int, delimiter=',')
-
-
 
     inputs = dict()
     labels = dict()
@@ -77,6 +77,7 @@ def load_normalized_mnist_data_flat():
     print('Data loading completed')
     return inputs, labels
 
+
 def load_normalized_mnist_data_conv():
     '''
     Loads and normalizes the MNIST data. Reads the data from
@@ -100,12 +101,12 @@ def load_normalized_mnist_data_conv():
     labels = dict()
 
     train_data = data[:50000]
-    train_inputs = train_data[:, 1:].reshape(-1,1,28,28)
+    train_inputs = train_data[:, 1:].reshape(-1, 1, 28, 28)
 
     val_data = data[50000:]
-    val_inputs = val_data[:, 1:].reshape(-1,1,28,28)
+    val_inputs = val_data[:, 1:].reshape(-1, 1, 28, 28)
 
-    test_inputs = test_data[:, 1:].reshape(-1,1,28,28)
+    test_inputs = test_data[:, 1:].reshape(-1, 1, 28, 28)
 
     mean = np.mean(train_inputs)
     std = np.std(train_inputs)

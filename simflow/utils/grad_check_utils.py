@@ -1,5 +1,7 @@
 # source https://github.com/parasdahal/deepnet
 import numpy as np
+
+
 def numerical_gradient_array(f, x, df, h=1e-5):
     """
     Evaluate a numeric gradient for a function that accepts a numpy

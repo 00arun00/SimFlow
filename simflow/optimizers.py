@@ -1,4 +1,6 @@
 import numpy as np
+
+
 class Optimizer(object):
     '''
     Optimizer Class:
@@ -9,6 +11,7 @@ class Optimizer(object):
     that can be used for training models.
 
     '''
+
     def __init__(self, **kwargs):
         '''
         Initializes updates and weights to empty list
@@ -25,7 +28,7 @@ class Optimizer(object):
         self.updates = []
         self.weights = []
 
-    def get_var_and_grads(self,vars_and_grads):
+    def get_var_and_grads(self, vars_and_grads):
         '''
         splits vars_and_grads into variables and gradients
         also clips gradients to clipvalue chosen before
@@ -37,21 +40,20 @@ class Optimizer(object):
             grads (list of numpy.ndarray)  : pointers to gradients to be updated
         '''
         try:
-            params,grads = zip(*vars_and_grads)
+            params, grads = zip(*vars_and_grads)
         except ValueError:
             raise ValueError('no gradients found please reacheck')
         # if None in gs:
         #     raise ValueError('One of your gradients have an undefined gradient please check')
-        if hasattr(self,'clipvalue') and self.clipvalue>0:
-            grads = [np.clip(g,-self.clipvalue,self.clipvalue) for g in grads]
-        return params,grads
+        if hasattr(self, 'clipvalue') and self.clipvalue > 0:
+            grads = [np.clip(g, -self.clipvalue, self.clipvalue) for g in grads]
+        return params, grads
 
-    def update_step(self,vars_and_grads):
+    def update_step(self, vars_and_grads):
         '''
         updates vara and grads
         '''
         raise NotImplementedError('optimizer not defined')
-
 
 
 class SGD(Optimizer):
@@ -80,39 +82,40 @@ class SGD(Optimizer):
         :nestrov (bool):   set True to enable Nestrov  [default = False]
         :clipvalue (float):   value to clip gradients to [default = inf]
     '''
-    def __init__(self,lr=0.01,momentum=0,decay=0,nestrov=False,**kwargs):
-        super(SGD,self).__init__(**kwargs)
-        assert isinstance(lr,float)
-        assert isinstance(momentum,float) or isinstance(momentum,int)
-        assert isinstance(decay,float) or isinstance(decay,int)
-        assert isinstance(nestrov,bool)
-        assert decay >= 0,"-ve decay not valid"
-        assert momentum >=0,"-ve momentum not valid"
-        assert momentum <1,f"momentum should be <1, currently {momentum}"
-        assert lr>0,f"lr should be >0,currently {lr}"
+
+    def __init__(self, lr=0.01, momentum=0, decay=0, nestrov=False, **kwargs):
+        super(SGD, self).__init__(**kwargs)
+        assert isinstance(lr, float)
+        assert isinstance(momentum, float) or isinstance(momentum, int)
+        assert isinstance(decay, float) or isinstance(decay, int)
+        assert isinstance(nestrov, bool)
+        assert decay >= 0, "-ve decay not valid"
+        assert momentum >= 0, "-ve momentum not valid"
+        assert momentum < 1, f"momentum should be <1, currently {momentum}"
+        assert lr > 0, f"lr should be >0,currently {lr}"
         self.lr = lr
         self.momentum = momentum
         self.decay = decay
         self.nestrov = nestrov
         self.iter = 0
 
-    def update_step(self,vars_and_grads):
+    def update_step(self, vars_and_grads):
         '''
         updates vara and grads using SGD
 
         Args:
             vars_and_grads (list of tuples of numpy.ndarray) : list of tuples of variable and gradient to be updated
         '''
-        params,grads = self.get_var_and_grads(vars_and_grads)
-        if not hasattr(self,'v_grads') and self.momentum:
-            #for the first time we need  to init v_grads with zeros
+        params, grads = self.get_var_and_grads(vars_and_grads)
+        if not hasattr(self, 'v_grads') and self.momentum:
+            # for the first time we need  to init v_grads with zeros
             self.v_grads = [np.zeros_like(g) for g in grads]
-        self.iter+=1
+        self.iter += 1
         lr = self.lr
         lr *= (1/(1+self.decay*self.iter))
 
         if self.momentum:
-            for p,g,v in zip(params,grads,self.v_grads):
+            for p, g, v in zip(params, grads, self.v_grads):
                 v *= self.momentum
                 v -= (lr * g)
                 if self.nestrov:
@@ -120,7 +123,7 @@ class SGD(Optimizer):
                 else:
                     p += v
         else:
-            for p,g in zip(params,grads):
+            for p, g in zip(params, grads):
                 p -= lr*g
 
 
@@ -139,17 +142,18 @@ class RMSProp(Optimizer):
         - [rmsprop: Divide the gradient by a running average of its recent magnitude
            ](http://www.cs.toronto.edu/~tijmen/csc321/slides/lecture_slides_lec6.pdf)
     '''
-    def __init__(self,lr=0.001,rho=0.9,decay=0,eps=1e-7,**kwargs):
-        super(RMSProp,self).__init__(**kwargs)
-        assert isinstance(lr,float)
-        assert isinstance(rho,float) or isinstance(rho,int)
-        assert isinstance(decay,float) or isinstance(decay,int)
-        assert isinstance(eps,float) or isinstance(eps,int)
 
-        assert decay >= 0,"-ve decay not valid"
-        assert rho >=0,"-ve rho not valid"
-        assert rho <1,f"rho should be <1, currently {rho}"
-        assert lr>0,f"lr should be >0,currently {lr}"
+    def __init__(self, lr=0.001, rho=0.9, decay=0, eps=1e-7, **kwargs):
+        super(RMSProp, self).__init__(**kwargs)
+        assert isinstance(lr, float)
+        assert isinstance(rho, float) or isinstance(rho, int)
+        assert isinstance(decay, float) or isinstance(decay, int)
+        assert isinstance(eps, float) or isinstance(eps, int)
+
+        assert decay >= 0, "-ve decay not valid"
+        assert rho >= 0, "-ve rho not valid"
+        assert rho < 1, f"rho should be <1, currently {rho}"
+        assert lr > 0, f"lr should be >0,currently {lr}"
         self.lr = lr
         self.rho = rho
         self.decay = decay
@@ -159,26 +163,27 @@ class RMSProp(Optimizer):
         if self.eps == 0:
             self.eps = 1e-7
 
-    def update_step(self,vars_and_grads):
+    def update_step(self, vars_and_grads):
         '''
         updates vara and grads using RMSProp
 
         Args:
             vars_and_grads (list of tuples of numpy.ndarray) : list of tuples of variable and gradient to be updated
         '''
-        params,grads = self.get_var_and_grads(vars_and_grads)
-        if not hasattr(self,'a_grads'):
-            #for the first time we need  to init a_grads with zeros
+        params, grads = self.get_var_and_grads(vars_and_grads)
+        if not hasattr(self, 'a_grads'):
+            # for the first time we need  to init a_grads with zeros
             self.a_grads = [np.zeros_like(g) for g in grads]
 
-        self.iter+=1
+        self.iter += 1
         lr = self.lr
         lr *= (1/(1+self.decay*self.iter))
 
-        for p,g,a in zip(params,grads,self.a_grads):
+        for p, g, a in zip(params, grads, self.a_grads):
             a *= self.rho
             a += (1-self.rho) * np.square(g)
             p -= lr * (g/(np.sqrt(a)+self.eps))
+
 
 class Adagrad(Optimizer):
     '''
@@ -201,15 +206,15 @@ class Adagrad(Optimizer):
         - [Adaptive Subgradient Methods for Online Learning and Stochastic
            Optimization](http://www.jmlr.org/papers/volume12/duchi11a/duchi11a.pdf)
     '''
-    def __init__(self,lr=0.01,decay=0,eps=1e-7,**kwargs):
-        super(Adagrad,self).__init__(**kwargs)
-        assert isinstance(lr,float)
-        assert isinstance(decay,float) or isinstance(decay,int)
-        assert isinstance(eps,float) or isinstance(eps,int)
 
+    def __init__(self, lr=0.01, decay=0, eps=1e-7, **kwargs):
+        super(Adagrad, self).__init__(**kwargs)
+        assert isinstance(lr, float)
+        assert isinstance(decay, float) or isinstance(decay, int)
+        assert isinstance(eps, float) or isinstance(eps, int)
 
-        assert decay >= 0,"-ve decay not valid"
-        assert lr>0,f"lr should be >0,currently {lr}"
+        assert decay >= 0, "-ve decay not valid"
+        assert lr > 0, f"lr should be >0,currently {lr}"
         self.lr = lr
         self.decay = decay
         self.iter = 0
@@ -217,23 +222,22 @@ class Adagrad(Optimizer):
         if self.eps == 0:
             self.eps = 1e-7
 
-
-    def update_step(self,vars_and_grads):
+    def update_step(self, vars_and_grads):
         '''
         updates vara and grads using Adagrad
 
         Args:
             vars_and_grads (list of tuples of numpy.ndarray) : list of tuples of variable and gradient to be updated
         '''
-        params,grads = self.get_var_and_grads(vars_and_grads)
-        if not hasattr(self,'a_grads'):
-            #for the first time we need  to init a_grads with zeros
+        params, grads = self.get_var_and_grads(vars_and_grads)
+        if not hasattr(self, 'a_grads'):
+            # for the first time we need  to init a_grads with zeros
             self.a_grads = [np.zeros_like(g) for g in grads]
-        self.iter+=1
+        self.iter += 1
         lr = self.lr
         lr *= (1/(1+self.decay*self.iter))
 
-        for p,g,a in zip(params,grads,self.a_grads):
+        for p, g, a in zip(params, grads, self.a_grads):
             a += np.square(g)
             p -= lr * (g/(np.sqrt(a)+self.eps))
 
@@ -261,18 +265,18 @@ class Adadelta(Optimizer):
         - [Adadelta - an adaptive learning rate method](
            https://arxiv.org/abs/1212.5701)
     '''
-    def __init__(self,lr=1,rho = 0.95,decay=0,eps=1e-7,**kwargs):
-        super(Adadelta,self).__init__(**kwargs)
-        assert isinstance(lr,float) or isinstance(lr,int)
-        assert isinstance(decay,float) or isinstance(decay,int)
-        assert isinstance(rho,float) or isinstance(rho,int)
-        assert isinstance(eps,float) or isinstance(eps,int)
 
+    def __init__(self, lr=1, rho=0.95, decay=0, eps=1e-7, **kwargs):
+        super(Adadelta, self).__init__(**kwargs)
+        assert isinstance(lr, float) or isinstance(lr, int)
+        assert isinstance(decay, float) or isinstance(decay, int)
+        assert isinstance(rho, float) or isinstance(rho, int)
+        assert isinstance(eps, float) or isinstance(eps, int)
 
-        assert decay >= 0,"-ve decay not valid"
-        assert lr > 0,f"lr should be > 0,currently {lr}"
-        assert rho >= 0,f"rho should be >= 0,currently {rho}"
-        assert rho <1, f"rho should be < 1, currently {rho}"
+        assert decay >= 0, "-ve decay not valid"
+        assert lr > 0, f"lr should be > 0,currently {lr}"
+        assert rho >= 0, f"rho should be >= 0,currently {rho}"
+        assert rho < 1, f"rho should be < 1, currently {rho}"
 
         self.lr = lr
         self.rho = rho
@@ -282,28 +286,27 @@ class Adadelta(Optimizer):
         if self.eps == 0:
             self.eps = 1e-7
 
-
-    def update_step(self,vars_and_grads):
+    def update_step(self, vars_and_grads):
         '''
         updates vara and grads using Adagrad
 
         Args:
             vars_and_grads (list of tuples of numpy.ndarray) : list of tuples of variable and gradient to be updated
         '''
-        params,grads = self.get_var_and_grads(vars_and_grads)
-        if not hasattr(self,'a_grads'):
-            #for the first time we need  to init a_grads with zeros
+        params, grads = self.get_var_and_grads(vars_and_grads)
+        if not hasattr(self, 'a_grads'):
+            # for the first time we need  to init a_grads with zeros
             self.a_grads = [np.zeros_like(g) for g in grads]
-        if not hasattr(self,'da_grads'):
-            #for the first time we need  to init da_grads with zeros
+        if not hasattr(self, 'da_grads'):
+            # for the first time we need  to init da_grads with zeros
             self.da_grads = [np.zeros_like(g) for g in grads]
 
-        self.iter+=1
+        self.iter += 1
 
         lr = self.lr
         lr *= (1/(1+self.decay*self.iter))
 
-        for p,g,a,d_a in zip(params,grads,self.a_grads,self.da_grads):
+        for p, g, a, d_a in zip(params, grads, self.a_grads, self.da_grads):
             a *= self.rho
             a += (1-self.rho) * np.square(g)
 
@@ -335,20 +338,21 @@ class Adam(Optimizer):
         - [On the Convergence of Adam and Beyond](
            https://openreview.net/forum?id=ryQu7f-RZ)
     '''
-    def __init__(self,lr=0.001,beta_1=0.9,beta_2=0.999,decay=0,eps=0,amsgrad=False,curve_correction=False,**kwargs):
-        super(Adam,self).__init__(**kwargs)
-        assert isinstance(lr,float)
-        assert isinstance(beta_1,float) or isinstance(beta_1,int)
-        assert isinstance(beta_2,float) or isinstance(beta_2,int)
 
-        assert isinstance(decay,float) or isinstance(decay,int)
-        assert isinstance(amsgrad,bool)
-        assert isinstance(curve_correction,bool)
+    def __init__(self, lr=0.001, beta_1=0.9, beta_2=0.999, decay=0, eps=0, amsgrad=False, curve_correction=False, **kwargs):
+        super(Adam, self).__init__(**kwargs)
+        assert isinstance(lr, float)
+        assert isinstance(beta_1, float) or isinstance(beta_1, int)
+        assert isinstance(beta_2, float) or isinstance(beta_2, int)
 
-        assert decay >= 0,"-ve decay not valid"
-        assert beta_1 >=0 and beta_2>=0,"-ve moments not valid"
-        assert beta_1 <1 and beta_2 < 1,f"both moments should be <1, currently {beta_1,beta_2}"
-        assert lr>0,f"lr should be >0,currently {lr}"
+        assert isinstance(decay, float) or isinstance(decay, int)
+        assert isinstance(amsgrad, bool)
+        assert isinstance(curve_correction, bool)
+
+        assert decay >= 0, "-ve decay not valid"
+        assert beta_1 >= 0 and beta_2 >= 0, "-ve moments not valid"
+        assert beta_1 < 1 and beta_2 < 1, f"both moments should be <1, currently {beta_1,beta_2}"
+        assert lr > 0, f"lr should be >0,currently {lr}"
         self.lr = lr
         self.beta_1 = beta_1
         self.beta_2 = beta_2
@@ -360,54 +364,54 @@ class Adam(Optimizer):
         if self.eps == 0:
             self.eps = 1e-7
 
-    def update_step(self,vars_and_grads):
+    def update_step(self, vars_and_grads):
         '''
         updates vara and grads using SGD
 
         Args:
             vars_and_grads (list of tuples of numpy.ndarray) : list of tuples of variable and gradient to be updated
         '''
-        params,grads = self.get_var_and_grads(vars_and_grads)
-        if not hasattr(self,'m_grads'):
-            #for the first time we need  to init m_grads with zeros
+        params, grads = self.get_var_and_grads(vars_and_grads)
+        if not hasattr(self, 'm_grads'):
+            # for the first time we need  to init m_grads with zeros
             self.m_grads = [np.zeros_like(g) for g in grads]
-        if not hasattr(self,'v_grads'):
-            #for the first time we need  to init v_grads with zeros
+        if not hasattr(self, 'v_grads'):
+            # for the first time we need  to init v_grads with zeros
             self.v_grads = [np.zeros_like(g) for g in grads]
 
-        if not hasattr(self,'vhats'):
+        if not hasattr(self, 'vhats'):
             if self.amsgrad:
                 self.vhats = [np.zeros_like(g) for g in grads]
             else:
                 self.vhats = [np.zeros(1) for _ in grads]
 
-        self.iter+=1
+        self.iter += 1
 
         lr = self.lr
         lr *= (1/(1+self.decay*self.iter))
 
-        for p,g,m,v,vhat in zip(params,grads,self.m_grads,self.v_grads,self.vhats):
-            #update first moment
-            m *=self.beta_1
+        for p, g, m, v, vhat in zip(params, grads, self.m_grads, self.v_grads, self.vhats):
+            # update first moment
+            m *= self.beta_1
             m += (1-self.beta_1) * g
 
-            #curve correction
+            # curve correction
             if self.curve_correction:
                 m_c = m / (1-self.beta_1**self.iter)
             else:
                 m_c = m
 
-            #update second moment
-            v *=self.beta_2
+            # update second moment
+            v *= self.beta_2
             v += (1-self.beta_2) * np.square(g)
-            #curve_correction
+            # curve_correction
             if self.curve_correction:
                 v_c = v / (1-self.beta_2**self.iter)
             else:
                 v_c = v
 
             if self.amsgrad:
-                vhat = np.maximum(vhat,v_c)
+                vhat = np.maximum(vhat, v_c)
                 p -= lr * m_c / (np.sqrt(vhat)+self.eps)
             else:
                 p -= lr * m_c / (np.sqrt(v_c)+self.eps)
