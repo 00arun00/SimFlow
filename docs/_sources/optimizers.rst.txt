@@ -1,6 +1,0 @@
-Optimizers
-==========
-
-.. automodule:: optimizers
-   :members:
-
