@@ -31,7 +31,7 @@ def load_normalized_mnist_data_flat():
         except FileExistsError:
             pass
         wget.download(url, 'data/mnist_train.csv')
-        print('Now loading data please wait will take around a minute')
+        print('\nNow loading data please wait will take around a minute')
 
         data = np.loadtxt('data/mnist_train.csv', dtype=int, delimiter=',')
 
@@ -49,7 +49,7 @@ def load_normalized_mnist_data_flat():
         except FileExistsError:
             pass
         wget.download(url, 'data/mnist_test.csv')
-        print('Now loading data please wait will take around a minute')
+        print('\nNow loading data please wait will take around a minute')
 
         test_data = np.loadtxt('data/mnist_test.csv', dtype=int, delimiter=',')
 
