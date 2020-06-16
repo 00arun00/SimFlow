@@ -8,13 +8,13 @@ def numerical_gradient_array(f, x, df, h=1e-5):
     array and returns a numpy array.
 
     Args:
-        f (function)         :     function that is passed to compute gradient for
-        x (numpy.ndarray)    :     input to function
-        df (numpy.ndarray)   :     output gradient
-        h (float)            :     delta around which gradient is calculated
+        f (function): function that is passed to compute gradient for
+        x (numpy.ndarray): input to function
+        df (numpy.ndarray): output gradient
+        h (float): delta around which gradient is calculated
 
-    Return:
-        grad (numpy.ndarray) :     computed numeric gradient
+    Returns:
+        grad (numpy.ndarray): computed numeric gradient
     """
     grad = np.zeros_like(x)
     it = np.nditer(x, flags=['multi_index'], op_flags=['readwrite'])

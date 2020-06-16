@@ -2,7 +2,8 @@
 import numpy as np
 
 
-def get_im2col_indices(x_shape, field_height=3, field_width=3, padding=1, stride=1):
+def get_im2col_indices(x_shape, field_height=3,
+                       field_width=3, padding=1, stride=1):
     # First figure out what the size of the output should be
     N, C, H, W = x_shape
     assert (H + 2 * padding - field_height) % stride == 0
@@ -18,7 +19,8 @@ def get_im2col_indices(x_shape, field_height=3, field_width=3, padding=1, stride
     i = i0.reshape(-1, 1) + i1.reshape(1, -1)
     j = j0.reshape(-1, 1) + j1.reshape(1, -1)
 
-    k = np.repeat(np.arange(C, dtype='int32'), field_height * field_width).reshape(-1, 1)
+    k = np.repeat(np.arange(C, dtype='int32'),
+                  field_height * field_width).reshape(-1, 1)
 
     return (k, i, j)
 
@@ -50,6 +52,3 @@ def col2im_indices(cols, x_shape, field_height=3, field_width=3, padding=1,
     if padding == 0:
         return x_padded
     return x_padded[:, :, padding:-padding, padding:-padding]
-
-
-pass
