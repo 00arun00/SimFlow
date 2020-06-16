@@ -1,4 +1,0 @@
-numpy
-os
-wget
-pytest
