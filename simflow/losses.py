@@ -7,7 +7,7 @@ class Loss(ABC):
     Abstract class representing a loss function
     '''
     @abstractmethod
-    def get_loss(self):
+    def get_loss(self, scores, labels):
         """
         will return the loss value
         """
