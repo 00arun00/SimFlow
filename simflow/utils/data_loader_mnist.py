@@ -20,7 +20,7 @@ def load_normalized_mnist_data_flat():
     try:
         print('loading data please wait will take around a minute')
         data = np.loadtxt('data/mnist_train.csv', dtype=int, delimiter=',')
-    except:
+    except OSError:
         import os
         import wget
         url = 'https://pjreddie.com/media/files/mnist_train.csv'
@@ -28,7 +28,7 @@ def load_normalized_mnist_data_flat():
         print('Downloading data will take some time')
         try:
             os.mkdir('data')
-        except:
+        except FileExistsError:
             pass
         wget.download(url, 'data/mnist_train.csv')
         print('Now loading data please wait will take around a minute')
@@ -38,7 +38,7 @@ def load_normalized_mnist_data_flat():
     try:
         print('loading data please wait will take around a minute')
         test_data = np.loadtxt('data/mnist_test.csv', dtype=int, delimiter=',')
-    except:
+    except OSError:
         import os
         import wget
         url = 'https://pjreddie.com/media/files/mnist_test.csv'
@@ -46,7 +46,7 @@ def load_normalized_mnist_data_flat():
         print('Downloading data will take some time')
         try:
             os.mkdir('data')
-        except:
+        except FileExistsError:
             pass
         wget.download(url, 'data/mnist_test.csv')
         print('Now loading data please wait will take around a minute')
