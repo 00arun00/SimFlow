@@ -359,8 +359,8 @@ class Adam(Optimizer):
         """
         super(Adam, self).__init__(**kwargs)
         assert isinstance(lr, float)
-        assert isinstance(beta_1, float) or isinstance(beta_1, int)
-        assert isinstance(beta_2, float) or isinstance(beta_2, int)
+        assert isinstance(beta_1, (float, int))
+        assert isinstance(beta_2, (float, int))
 
         assert isinstance(decay, (float, int))
         assert isinstance(amsgrad, bool)
