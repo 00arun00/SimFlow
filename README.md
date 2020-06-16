@@ -1,8 +1,9 @@
 # SimFlow
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/simflow)](https://pypi.org/project/simflow/)  [![GitHub](https://img.shields.io/github/license/00arun00/SimFlow)](https://github.com/00arun00/SimFlow/blob/master/LICENSE) [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/00arun00/SimFlow/Main)](https://github.com/00arun00/SimFlow/actions?query=workflow%3AMain)
+  [![CodeFactor](https://www.codefactor.io/repository/github/00arun00/simflow/badge)](https://www.codefactor.io/repository/github/00arun00/simflow)      
 Ultra portable Deep Learning framework in Numpy
 
-
-Link to official Documentation : https://00arun00.github.io/SimFlow/
+*note doc website currently down - will be up soon
 ### Currently supported features
 
 #### Layers:
