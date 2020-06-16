@@ -152,7 +152,7 @@ class Conv2D(Layer):
 
         h_out, w_out = int(h_out), int(w_out)
 
-        Input_col = im2col_indices(Input, h_filter, w_filter, padding=padding, stride=stride)
+        Input_col = im2col.im2col_indices(Input, h_filter, w_filter, padding=padding, stride=stride)
         kernel_row = kernel.reshape(n_filter, -1)
         out = kernel_row @ Input_col + bias
         out = out.reshape(n_filter, h_out, w_out, n_x)

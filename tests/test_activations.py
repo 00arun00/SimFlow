@@ -1,84 +1,37 @@
 import numpy as np
-from layers import ReLU,LeakyReLU,Softplus,exp
-from grad_check_utils import numerical_gradient_array
-
-def test_relu_back_prop():
-    eps = 1e-7
-
-    batch_size = 32
-    h_x,w_x = 7,7
-    inChannels = 3
-
-    x = np.random.randn(batch_size, inChannels, h_x, w_x)
-    dout = np.random.randn(batch_size, inChannels, h_x, w_x)
-
-    r_layer = ReLU(trainable=True)
-
-    dx_num = numerical_gradient_array(lambda x: r_layer.forward(x), x, dout,h=eps)
+from simflow.layers.activations import ReLU, LeakyReLU, Softplus, exp
+from simflow.utils.grad_check_utils import numerical_gradient_array
+import unittest
 
 
-    out = r_layer(x)
-    dx,_ = r_layer.backward(dout)
+class TestActivations(unittest.TestCase):
+    def setUp(self):
+        self.eps = 1e-7
+        self.batch_size = 32
+        self.h_x, self.w_x = 7, 7
+        self.inChannels = 3
 
-    assert np.allclose(dx,dx_num,atol=eps)
+        self.x = np.random.randn(self.batch_size, self.inChannels,
+                                 self.h_x, self.w_x)
+        self.dout = np.random.randn(self.batch_size, self.inChannels,
+                                    self.h_x, self.w_x)
 
-def test_LeakyReLU_back_prop():
-    eps = 1e-7
+    def helper_grad_check(self, Layer):
+        layer = Layer(trainable=True)
+        dx_num = numerical_gradient_array(lambda x: layer.forward(self.x),
+                                          self.x, self.dout, h=self.eps)
+        dx, _ = layer.backward(self.dout)
 
-    batch_size = 32
-    h_x,w_x = 7,7
-    inChannels = 3
+        assert np.allclose(dx, dx_num, atol=self.eps)
 
-    x = np.random.randn(batch_size, inChannels, h_x, w_x)
-    dout = np.random.randn(batch_size, inChannels, h_x, w_x)
+    def test_relu_back_prop(self):
+        self.helper_grad_check(ReLU)
 
-    a_layer = LeakyReLU(alpha=0.1,trainable=True)
+    def test_LeakyReLU_back_prop(self):
+        self.helper_grad_check(LeakyReLU)
 
-    dx_num = numerical_gradient_array(lambda x: a_layer.forward(x), x, dout,h=eps)
+    def test_Softplus_back_prop(self):
+        self.helper_grad_check(Softplus)
 
-
-    out = a_layer(x)
-    dx,_ = a_layer.backward(dout)
-
-    assert np.allclose(dx,dx_num,atol=eps)
-
-
-def test_Softplus_back_prop():
-    eps = 1e-7
-
-    batch_size = 32
-    h_x,w_x = 7,7
-    inChannels = 3
-
-    x = np.random.randn(batch_size, inChannels, h_x, w_x)
-    dout = np.random.randn(batch_size, inChannels, h_x, w_x)
-
-    a_layer = Softplus(trainable=True)
-
-    dx_num = numerical_gradient_array(lambda x: a_layer.forward(x), x, dout,h=eps)
-
-
-    out = a_layer(x)
-    dx,_ = a_layer.backward(dout)
-
-    assert np.allclose(dx,dx_num,atol=eps)
-
-def test_exp_back_prop():
-    eps = 1e-7
-
-    batch_size = 32
-    h_x,w_x = 7,7
-    inChannels = 3
-
-    x = np.random.randn(batch_size, inChannels, h_x, w_x)
-    dout = np.random.randn(batch_size, inChannels, h_x, w_x)
-
-    a_layer = exp(trainable=True)
-
-    dx_num = numerical_gradient_array(lambda x: a_layer.forward(x), x, dout,h=eps)
-
-
-    out = a_layer(x)
-    dx,_ = a_layer.backward(dout)
-
-    assert np.allclose(dx,dx_num,atol=eps)
+    def test_exp_back_prop(self):
+        self.helper_grad_check(exp)
