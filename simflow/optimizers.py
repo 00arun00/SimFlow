@@ -1,7 +1,8 @@
 import numpy as np
+from abc import ABC, abstractmethod
 
 
-class Optimizer(object):
+class Optimizer(ABC):
     '''
     Optimizer Class:
     Used to update parameters
@@ -17,7 +18,7 @@ class Optimizer(object):
         Initializes updates and weights to empty list
 
         Args:
-            clipvalue (float) : value to clip gradients to
+            clipvalue (float): value to clip gradients to
         '''
         allowed_kwargs = {'clipvalue'}
         for k in kwargs:
@@ -34,30 +35,32 @@ class Optimizer(object):
         also clips gradients to clipvalue chosen before
 
         Args:
-            vars_and_grads (list of tuples of numpy.ndarray) : list of tuples of variable and gradient to be updated
+            vars_and_grads (List[Tuple[np.ndarray]]): variables and gradients
         Returns:
-            params (list of numpy.ndarray) : pointers to variable to be updated
-            grads (list of numpy.ndarray)  : pointers to gradients to be updated
+            params (List[np.ndarray]): pointers to variable to be updated
+            grads (List[np.ndarray]): pointers to gradients to be updated
         '''
         try:
             params, grads = zip(*vars_and_grads)
         except ValueError:
-            raise ValueError('no gradients found please reacheck')
-        # if None in gs:
-        #     raise ValueError('One of your gradients have an undefined gradient please check')
+            raise ValueError('no gradients found please re-check')
+
         if hasattr(self, 'clipvalue') and self.clipvalue > 0:
-            grads = [np.clip(g, -self.clipvalue, self.clipvalue) for g in grads]
+            grads = [np.clip(g, -self.clipvalue, self.clipvalue)
+                     for g in grads]
         return params, grads
 
+    @abstractmethod
     def update_step(self, vars_and_grads):
-        '''
+        '''abstractmethod update_step
+
         updates vara and grads
         '''
-        raise NotImplementedError('optimizer not defined')
 
 
 class SGD(Optimizer):
-    '''
+    '''Stochastic Gradient Descent
+
     Stochastic Gradient Descent combined method of the following methods of
     gradient Descent
 
@@ -74,16 +77,18 @@ class SGD(Optimizer):
         Smarter momentum take update in direction of velocity and correct based on grad
             v(t) = momentum*v(t-1) - lr*grad
             W(t) = W(t-1) -lr*grad + momentum*v(t)
-
-    Args:
-        :lr(float):   learning rate [default = 0.01]
-        :momentum (float):   momentum factor used [default = 0]
-        :decay(float):   decay factor by which learning rate reduces [default = 0]
-        :nestrov (bool):   set True to enable Nestrov  [default = False]
-        :clipvalue (float):   value to clip gradients to [default = inf]
     '''
 
     def __init__(self, lr=0.01, momentum=0, decay=0, nestrov=False, **kwargs):
+        """Setup SGD
+
+        Args:
+            lr(float): learning rate [default = 0.01]
+            momentum (float): momentum factor used [default = 0]
+            decay(float): decay factor by which learning rate reduces [default = 0]
+            nestrov (bool): set True to enable Nestrov  [default = False]
+            clipvalue (float): value to clip gradients to [default = inf]
+        """
         super(SGD, self).__init__(**kwargs)
         assert isinstance(lr, float)
         assert isinstance(momentum, float) or isinstance(momentum, int)
@@ -104,7 +109,7 @@ class SGD(Optimizer):
         updates vara and grads using SGD
 
         Args:
-            vars_and_grads (list of tuples of numpy.ndarray) : list of tuples of variable and gradient to be updated
+            vars_and_grads (List[Tuple[np.ndarray]]) : variables and gradients
         '''
         params, grads = self.get_var_and_grads(vars_and_grads)
         if not hasattr(self, 'v_grads') and self.momentum:
@@ -128,15 +133,9 @@ class SGD(Optimizer):
 
 
 class RMSProp(Optimizer):
-    '''
-    RMSProp Gradient Descent
+    '''RMSProp
 
-    Args:
-        :lr(float):   learning rate [default = 0.001]
-        :rho (float):   RMSProp decay factor used [default = 0.9]
-        :decay(float):   decay factor by which learning rate reduces [default = 0]
-        :eps (float):   Fuzziness factor  [default = 1e-7]
-        :clipvalue (float):   value to clip gradients to [default = inf]
+    Gradient Descent using RMSProp algorithm
 
     References:
         - [rmsprop: Divide the gradient by a running average of its recent magnitude
@@ -144,6 +143,15 @@ class RMSProp(Optimizer):
     '''
 
     def __init__(self, lr=0.001, rho=0.9, decay=0, eps=1e-7, **kwargs):
+        """Setup RMSProp
+
+        Args:
+            lr(float): learning rate [default = 0.001]
+            rho (float): RMSProp decay factor used [default = 0.9]
+            decay(float): decay factor by which learning rate reduces [default = 0]
+            eps (float): Fuzziness factor  [default = 1e-7]
+            clipvalue (float): value to clip gradients to [default = inf]
+        """
         super(RMSProp, self).__init__(**kwargs)
         assert isinstance(lr, float)
         assert isinstance(rho, float) or isinstance(rho, int)
@@ -168,7 +176,7 @@ class RMSProp(Optimizer):
         updates vara and grads using RMSProp
 
         Args:
-            vars_and_grads (list of tuples of numpy.ndarray) : list of tuples of variable and gradient to be updated
+            vars_and_grads (List[Tuple[np.ndarray]]): variables and gradients
         '''
         params, grads = self.get_var_and_grads(vars_and_grads)
         if not hasattr(self, 'a_grads'):
@@ -196,18 +204,20 @@ class Adagrad(Optimizer):
 
     Suffers from the inherent problem of early stopping
 
-    Args:
-        :lr(float):   learning rate [default = 0.01]
-        :decay(float):   decay factor by which learning rate reduces [default = 0]
-        :eps (float):   Fuzziness factor  [default = 1e-7]
-        :clipvalue (float):   value to clip gradients to [default = inf]
-
     References:
         - [Adaptive Subgradient Methods for Online Learning and Stochastic
            Optimization](http://www.jmlr.org/papers/volume12/duchi11a/duchi11a.pdf)
     '''
 
     def __init__(self, lr=0.01, decay=0, eps=1e-7, **kwargs):
+        """Setup Adagrad
+
+        Args:
+            lr(float): learning rate [default = 0.01]
+            decay(float): decay factor [default = 0]
+            eps (float): Fuzziness factor  [default = 1e-7]
+            clipvalue (float): value to clip gradients to [default = inf]
+        """
         super(Adagrad, self).__init__(**kwargs)
         assert isinstance(lr, float)
         assert isinstance(decay, float) or isinstance(decay, int)
@@ -227,7 +237,7 @@ class Adagrad(Optimizer):
         updates vara and grads using Adagrad
 
         Args:
-            vars_and_grads (list of tuples of numpy.ndarray) : list of tuples of variable and gradient to be updated
+            vars_and_grads (List[Tuple[np.ndarray]]): variables and gradients
         '''
         params, grads = self.get_var_and_grads(vars_and_grads)
         if not hasattr(self, 'a_grads'):
@@ -254,19 +264,21 @@ class Adadelta(Optimizer):
     But overcomes the inherent problem of early stopping in Adadelta,
     since it accumulates only gradients within a fixed window.
 
-    Args:
-        :lr(float):   learning rate [default = 0.001]
-        :rho(float):   Adadelta decay factor
-        :decay(float):   decay factor by which learning rate reduces [default = 0]
-        :eps (float):   Fuzziness factor  [default = 1e-7]
-        :clipvalue (float):   value to clip gradients to [default = inf]
-
     References:
         - [Adadelta - an adaptive learning rate method](
            https://arxiv.org/abs/1212.5701)
     '''
 
     def __init__(self, lr=1, rho=0.95, decay=0, eps=1e-7, **kwargs):
+        """
+
+        Args:
+            lr(float): learning rate [default = 0.001]
+            rho(float): Adadelta decay factor
+            decay(float): decay factor [default = 0]
+            eps (float): Fuzziness factor  [default = 1e-7]
+            clipvalue (float): value to clip gradients to [default = inf]
+        """
         super(Adadelta, self).__init__(**kwargs)
         assert isinstance(lr, float) or isinstance(lr, int)
         assert isinstance(decay, float) or isinstance(decay, int)
@@ -291,7 +303,7 @@ class Adadelta(Optimizer):
         updates vara and grads using Adagrad
 
         Args:
-            vars_and_grads (list of tuples of numpy.ndarray) : list of tuples of variable and gradient to be updated
+            vars_and_grads (List[Tuple[np.ndarray]]) : list of tuples of variable and gradient to be updated
         '''
         params, grads = self.get_var_and_grads(vars_and_grads)
         if not hasattr(self, 'a_grads'):
@@ -323,15 +335,6 @@ class Adam(Optimizer):
     Adam
     Adaptive Moment Estimation in short combination of momentum and RMSProp
 
-    Args:
-        :lr(float):   learning rate [default = 0.001]
-        :beta_1 (float):   first moment factor used [default = 0.9]
-        :beta_2 (float):   second moment factor used [default = 0.999]
-        :decay(float):   the factor by which learning rate reduces [default = 0]
-        :amsgrad (bool):   set True to enable AMSGrad  [default = False]
-        :curve_correction (bool): set to True to enable curve_correction of grads [defaul = False]
-        :clipvalue (float):   value to clip gradients to [default = inf]
-
     References:
         - [Adam - A Method for Stochastic Optimization](
            https://arxiv.org/abs/1412.6980v8)
@@ -339,7 +342,20 @@ class Adam(Optimizer):
            https://openreview.net/forum?id=ryQu7f-RZ)
     '''
 
-    def __init__(self, lr=0.001, beta_1=0.9, beta_2=0.999, decay=0, eps=0, amsgrad=False, curve_correction=False, **kwargs):
+    def __init__(self, lr=0.001, beta_1=0.9, beta_2=0.999, decay=0,
+                 eps=0, amsgrad=False, curve_correction=False, **kwargs):
+        """Setup Adam
+
+        Args:
+            lr(float): learning rate [default = 0.001]
+            beta_1 (float): first moment factor used [default = 0.9]
+            beta_2 (float): second moment factor used [default = 0.999]
+            decay(float): decay rate [default = 0]
+            amsgrad (bool): set True to enable AMSGrad  [default = False]
+            curve_correction (bool): set to True to enable
+                curve_correction of grads [defaul = False]
+            clipvalue (float): value to clip gradients to [default = inf]
+        """
         super(Adam, self).__init__(**kwargs)
         assert isinstance(lr, float)
         assert isinstance(beta_1, float) or isinstance(beta_1, int)
@@ -351,7 +367,7 @@ class Adam(Optimizer):
 
         assert decay >= 0, "-ve decay not valid"
         assert beta_1 >= 0 and beta_2 >= 0, "-ve moments not valid"
-        assert beta_1 < 1 and beta_2 < 1, f"both moments should be <1, currently {beta_1,beta_2}"
+        assert beta_1 < 1 and beta_2 < 1, f"both moments should be <1"
         assert lr > 0, f"lr should be >0,currently {lr}"
         self.lr = lr
         self.beta_1 = beta_1
@@ -369,7 +385,7 @@ class Adam(Optimizer):
         updates vara and grads using SGD
 
         Args:
-            vars_and_grads (list of tuples of numpy.ndarray) : list of tuples of variable and gradient to be updated
+            vars_and_grads (List[Tuple[np.ndarray]]) : list of tuples of variable and gradient to be updated
         '''
         params, grads = self.get_var_and_grads(vars_and_grads)
         if not hasattr(self, 'm_grads'):
