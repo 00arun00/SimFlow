@@ -1,25 +1,33 @@
 import numpy as np
-class Loss(object):
+from abc import ABC, abstractmethod
+
+
+class Loss(ABC):
     '''
     Abstract class representing a loss function
     '''
+    @abstractmethod
     def get_loss(self):
-        raise NotImplementedError('This is an abstract class')
+        """
+        will return the loss value
+        """
+
 
 class SoftmaxCrossEntropyLoss(Loss):
     '''
     Represents the categorical softmax cross entropy loss
     '''
+
     def get_loss(self, scores, labels):
         '''
         Calculates the average categorical softmax cross entropy loss.
-        
+
         Args:
-            :scores (numpy.ndarray): Unnormalized logit class scores. Shape (batch_size, num_classes)
-            :labels (numpy.ndarray): True labels represented as ints (eg. 2 represents the third class). Shape (batch_size)
+            scores (numpy.ndarray): Unnormalized logit class scores.
+            labels (numpy.ndarray): True labels represented as ints
         Returns:
-            :loss (float): The average cross entropy between labels and the softmax normalization of scores
-            :grad (numpy.ndarray): Gradient for scores with respect to the loss. Shape (batch_size, num_classes)
+            loss (float): The average cross entropy
+            grad (numpy.ndarray): Gradient for scores w.r.t the loss.
         '''
         scores_norm = scores - np.max(scores, axis=1, keepdims=True)
         scores_norm = np.exp(scores_norm)
