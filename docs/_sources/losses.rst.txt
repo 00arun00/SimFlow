@@ -1,5 +1,0 @@
-Losses
-======
-
-.. automodule:: losses
-	:members:
