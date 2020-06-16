@@ -115,6 +115,6 @@ class stochastic_iterator(Iterator):
         Args:
             shuffle (bool): shuffles each time if set to True
         '''
-        super(fullbatch_iterator, self).__init__(batch_size=1,
-                                                 shuffle=shuffle,
-                                                 method='stochastic')
+        super(stochastic_iterator, self).__init__(batch_size=1,
+                                                  shuffle=shuffle,
+                                                  method='stochastic')
