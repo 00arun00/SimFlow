@@ -30,7 +30,7 @@ class TestDilatedConv(unittest.TestCase):
         dc_layer.W = w
         dc_layer.b = b
 
-        dx_num = numerical_gradient_array(lambda x: dc_layer.forward(x),
+        dx_num = numerical_gradient_array(dc_layer.forward,
                                           x, dout, h=eps)
         dw_num = numerical_gradient_array(lambda w: dc_layer.forward(x),
                                           w, dout, h=eps)

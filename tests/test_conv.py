@@ -71,8 +71,7 @@ class TestConv(TestCase):
         c_layer.W = w
         c_layer.b = b
 
-        dx_num = numerical_gradient_array(lambda x: c_layer.forward(x),
-                                          x, dout, h=eps)
+        dx_num = numerical_gradient_array(c_layer.forward, x, dout, h=eps)
         dw_num = numerical_gradient_array(lambda w: c_layer.forward(x),
                                           w, dout, h=eps)
         db_num = numerical_gradient_array(lambda b: c_layer.forward(x),
