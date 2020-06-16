@@ -38,7 +38,7 @@ jobs:
       run: |
         python setup.py develop
         pip install codecov pytest-cov
-        pytest --cov=pybotic/ --cov-report=xml
+        pytest --cov=simflow/ --cov-report=xml
     - name: Codecov
       uses: codecov/codecov-action@v1.0.7
       with:
