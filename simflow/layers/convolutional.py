@@ -101,8 +101,8 @@ class Conv2D(Layer):
             assert self.b.shape == db.shape, 'shape missmatch'
 
             return dX, [(self.W, dW), (self.b, db)]
-        else:
-            return dX, []
+        # if not trainable
+        return dX, []
 
     def __repr__(self):
         return (f'Conv2D Layer with {self.W.shape[0]}'
@@ -258,8 +258,8 @@ class dilated_Conv2D(Conv2D):
             assert self.W.shape == dW.shape
             assert self.b.shape == db.shape
             return dX, [(self.W, dW), (self.b, db)]
-        else:
-            return dX, []
+        # if not trainable
+        return dX, []
 
     def _create_dilation_mat_(self):
         '''
@@ -289,8 +289,8 @@ class dilated_Conv2D(Conv2D):
         base_config = super(Conv2D, self)._get_config_()
         return dict(list(base_config.items())+list(config.items()))
 
-        def __repr__(self):
-            return (f'Conv2D Layer with {self.W.shape[0]} '
-                    f'dilation = {self.dilation} number of filters of '
-                    f'shape {self.W.Shape[1:]}, Stide = {self.stride}, '
-                    f'padding = {self.padding} Trainable = {self.trainable}')
+    def __repr__(self):
+        return (f'Conv2D Layer with {self.W.shape[0]} '
+                f'dilation = {self.dilation} number of filters of '
+                f'shape {self.W.Shape[1:]}, Stide = {self.stride}, '
+                f'padding = {self.padding} Trainable = {self.trainable}')

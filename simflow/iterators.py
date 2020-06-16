@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class Iterator(object):
+class Iterator:
     '''
     Class representing Iterator
 
@@ -10,7 +10,7 @@ class Iterator(object):
         :shuffle (bool): shuffles each time if set to True
     '''
 
-    def __init__(self, batch_size=128, *, shuffle=True):
+    def __init__(self, batch_size=128, *, shuffle=True, method='direct'):
         '''
         Initializes the Iterator
         Args:
@@ -21,7 +21,7 @@ class Iterator(object):
         assert batch_size > 0, f'batch_size should be  > 0'
         self.batch_size = batch_size
         self.shuffle = shuffle
-        self.method = 'direct'
+        self.method = method
 
     def get_iterator(self, Data, Labels):
         """
@@ -37,7 +37,7 @@ class Iterator(object):
         """
         n_train = Data.shape[0]
         assert n_train == Labels.shape[0], 'len(Data) not same as len(Labels)'
-        if self.method == 'full batch':
+        if self.method == 'full_batch':
             self.batch_size = n_train
         if self.shuffle:
             order = np.random.permutation(n_train)
@@ -72,9 +72,9 @@ class minibatch_iterator(Iterator):
             batch_size (int) : batch size to used
             shuffle (bool)   : shuffles each time if set to True
         '''
-        self.batch_size = batch_size
-        self.shuffle = shuffle
-        self.method = 'mini_batch'
+        super(minibatch_iterator, self).__init__(batch_size=batch_size,
+                                                 shuffle=shuffle,
+                                                 method='mini_batch')
 
     def __repr__(self):
         return (f'mini_batch iterator '
@@ -96,9 +96,9 @@ class fullbatch_iterator(Iterator):
         Args:
             shuffle (bool)   : shuffles each time if set to True
         '''
-        self.batch_size = -1
-        self.shuffle = shuffle
-        self.method = 'full batch'
+        super(fullbatch_iterator, self).__init__(batch_size=-1,
+                                                 shuffle=shuffle,
+                                                 method='full_batch')
 
 
 class stochastic_iterator(Iterator):
@@ -115,6 +115,6 @@ class stochastic_iterator(Iterator):
         Args:
             shuffle (bool): shuffles each time if set to True
         '''
-        self.batch_size = 1
-        self.method = 'stochastic'
-        self.shuffle = shuffle
+        super(stochastic_iterator, self).__init__(batch_size=1,
+                                                  shuffle=shuffle,
+                                                  method='stochastic')
