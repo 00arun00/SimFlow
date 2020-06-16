@@ -13,7 +13,8 @@ class HelperClass(Layer):
         pass
 
     def backward(self):
-        pass
+        """dummy
+        """
 
 
 class TestLayerClass(TestCase):
