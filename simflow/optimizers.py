@@ -69,12 +69,12 @@ class SGD(Optimizer):
             W(t) = W(t-1) - lr * grad
 
     Momentum:
-        Keeps track of velocity of grad and takes a step in the direction of velocity
+        Keeps track of velocity and takes a step in the direction of velocity
             v(t) = momentum*v(t-1) - lr*grad
             W(t) = W(t-1) + v(t)
 
     Nestrov Momentum:
-        Smarter momentum take update in direction of velocity and correct based on grad
+        Smarter momentum step in direction of velocity, correct based on grad
             v(t) = momentum*v(t-1) - lr*grad
             W(t) = W(t-1) -lr*grad + momentum*v(t)
     '''
@@ -85,14 +85,15 @@ class SGD(Optimizer):
         Args:
             lr(float): learning rate [default = 0.01]
             momentum (float): momentum factor used [default = 0]
-            decay(float): decay factor by which learning rate reduces [default = 0]
+            decay(float): decay factor by which learning rate
+                reduces [default = 0]
             nestrov (bool): set True to enable Nestrov  [default = False]
             clipvalue (float): value to clip gradients to [default = inf]
         """
         super(SGD, self).__init__(**kwargs)
         assert isinstance(lr, float)
-        assert isinstance(momentum, float) or isinstance(momentum, int)
-        assert isinstance(decay, float) or isinstance(decay, int)
+        assert isinstance(momentum, (float, int))
+        assert isinstance(decay, (float, int))
         assert isinstance(nestrov, bool)
         assert decay >= 0, "-ve decay not valid"
         assert momentum >= 0, "-ve momentum not valid"
@@ -138,7 +139,7 @@ class RMSProp(Optimizer):
     Gradient Descent using RMSProp algorithm
 
     References:
-        - [rmsprop: Divide the gradient by a running average of its recent magnitude
+        - [rmsprop: Divide the gradient by a running average
            ](http://www.cs.toronto.edu/~tijmen/csc321/slides/lecture_slides_lec6.pdf)
     '''
 
@@ -148,15 +149,15 @@ class RMSProp(Optimizer):
         Args:
             lr(float): learning rate [default = 0.001]
             rho (float): RMSProp decay factor used [default = 0.9]
-            decay(float): decay factor by which learning rate reduces [default = 0]
+            decay(float): decay factor [default = 0]
             eps (float): Fuzziness factor  [default = 1e-7]
             clipvalue (float): value to clip gradients to [default = inf]
         """
         super(RMSProp, self).__init__(**kwargs)
         assert isinstance(lr, float)
-        assert isinstance(rho, float) or isinstance(rho, int)
-        assert isinstance(decay, float) or isinstance(decay, int)
-        assert isinstance(eps, float) or isinstance(eps, int)
+        assert isinstance(rho, (float, int))
+        assert isinstance(decay, (float, int))
+        assert isinstance(eps, (float, int))
 
         assert decay >= 0, "-ve decay not valid"
         assert rho >= 0, "-ve rho not valid"
@@ -220,8 +221,8 @@ class Adagrad(Optimizer):
         """
         super(Adagrad, self).__init__(**kwargs)
         assert isinstance(lr, float)
-        assert isinstance(decay, float) or isinstance(decay, int)
-        assert isinstance(eps, float) or isinstance(eps, int)
+        assert isinstance(decay, (float, int))
+        assert isinstance(eps, (float, int))
 
         assert decay >= 0, "-ve decay not valid"
         assert lr > 0, f"lr should be >0,currently {lr}"
@@ -280,10 +281,10 @@ class Adadelta(Optimizer):
             clipvalue (float): value to clip gradients to [default = inf]
         """
         super(Adadelta, self).__init__(**kwargs)
-        assert isinstance(lr, float) or isinstance(lr, int)
-        assert isinstance(decay, float) or isinstance(decay, int)
-        assert isinstance(rho, float) or isinstance(rho, int)
-        assert isinstance(eps, float) or isinstance(eps, int)
+        assert isinstance(lr, (float, int))
+        assert isinstance(decay, (float, int))
+        assert isinstance(rho, (float, int))
+        assert isinstance(eps, (float, int))
 
         assert decay >= 0, "-ve decay not valid"
         assert lr > 0, f"lr should be > 0,currently {lr}"
@@ -303,7 +304,7 @@ class Adadelta(Optimizer):
         updates vara and grads using Adagrad
 
         Args:
-            vars_and_grads (List[Tuple[np.ndarray]]) : list of tuples of variable and gradient to be updated
+            vars_and_grads (List[Tuple[np.ndarray]]) : variables and gradients
         '''
         params, grads = self.get_var_and_grads(vars_and_grads)
         if not hasattr(self, 'a_grads'):
@@ -361,7 +362,7 @@ class Adam(Optimizer):
         assert isinstance(beta_1, float) or isinstance(beta_1, int)
         assert isinstance(beta_2, float) or isinstance(beta_2, int)
 
-        assert isinstance(decay, float) or isinstance(decay, int)
+        assert isinstance(decay, (float, int))
         assert isinstance(amsgrad, bool)
         assert isinstance(curve_correction, bool)
 
@@ -385,7 +386,7 @@ class Adam(Optimizer):
         updates vara and grads using SGD
 
         Args:
-            vars_and_grads (List[Tuple[np.ndarray]]) : list of tuples of variable and gradient to be updated
+            vars_and_grads (List[Tuple[np.ndarray]]) : variables and gradients
         '''
         params, grads = self.get_var_and_grads(vars_and_grads)
         if not hasattr(self, 'm_grads'):
@@ -406,7 +407,8 @@ class Adam(Optimizer):
         lr = self.lr
         lr *= (1/(1+self.decay*self.iter))
 
-        for p, g, m, v, vhat in zip(params, grads, self.m_grads, self.v_grads, self.vhats):
+        for p, g, m, v, vhat in zip(params, grads, self.m_grads,
+                                    self.v_grads, self.vhats):
             # update first moment
             m *= self.beta_1
             m += (1-self.beta_1) * g
