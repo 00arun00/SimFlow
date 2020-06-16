@@ -187,8 +187,10 @@ class Model(object):
             raise NameError('Iterator not defined')
         for epoch in range(epochs):
             total_loss = 0
-            for curr_Data, curr_Labels in self.iterator.get_iterator(Data, Labels):
-                loss, vars_and_grads = self._forward_backward_(curr_Data, curr_Labels)
+            for curr_Data, curr_Labels in self.iterator.get_iterator(Data,
+                                                                     Labels):
+                loss, vars_and_grads = self._forward_backward_(curr_Data,
+                                                               curr_Labels)
                 self.optimizer.update_step(vars_and_grads)
                 total_loss += loss
             average_loss = total_loss/Data.shape[0]
@@ -205,8 +207,8 @@ class Model(object):
             :Labels (numpy.ndarray): Labels to find performance on
         '''
         assert hasattr(
-            self, "loss"), 'loss function not defined please set a loss function to score with'
-        assert Data.shape[0] == Labels.shape[0], 'Number of elements in data should same as number of elements in Label'
+            self, "loss"), 'please set a loss function to score with'
+        assert Data.shape[0] == Labels.shape[0], 'should same'
         scores = self.predict(Data)
         loss, _ = self.loss.get_loss(scores, Labels)
         pred = np.argmax(scores, axis=1)
