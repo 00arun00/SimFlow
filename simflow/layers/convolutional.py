@@ -7,38 +7,25 @@ from simflow.layers.layer_class import Layer
 class Conv2D(Layer):
     '''
     2D Convolutional Layer
-
-    Initialization:
-        :W: initialized with either Xavier or He initialization
-        :b: initialized to zero
-
-    Args:
-        :outChannels (int):   Number of output channels
-        :inChannels (int):   size of output requred
-        :filter_size (int):   Size of each kernel (filter_size x filter_size)
-        :stride (int):   Stride to be used
-        :padding (int):   Padding to be used for convolution
-        :init_method (str):   initialization method to be used for Weights
-        :trainable (bool):
-            :False: parameters of the layer are frozed
-            :True: parameters are updated during optimizer step
     '''
 
-    def __init__(self, outChannels, inChannels, filter_size, stride=1, padding=0, *, init_method='Xavier', trainable=False):
+    def __init__(self, outChannels, inChannels, filter_size, stride=1,
+                 padding=0, *, init_method='Xavier', trainable=False):
         '''
-        Initializes the Convolutional layer
-            W is initialized with either Xavier or He initialization
-            b is initialized to zero
+        Initialization:
+            W: initialized with either Xavier or He initialization
+            b: initialized to zero
 
         Args:
-            outChannels (int)   :   Number of output channels
-            inChannels (int)    :   size of output requred
-            filter_size (int)   :   Size of each kernel (filter_size x filter_size)
-            stride (int)        :   Stride to be used
-            padding (int)       :   Padding to be used for convolution
-            init_method (str)   :   initialization method to be used for Weights
-            trainable (bool)    :   if set to False parameters of the layer are frozed
-                                    if set to True parameters are updated during optimizer step
+            outChannels (int): Number of output channels
+            inChannels (int): size of output requred
+            filter_size (int): Size of each kernel (n x n)
+            stride (int): Stride to be used
+            padding (int): Padding to be used for convolution
+            init_method (str): initialization method to be used for Weights
+            trainable (bool):
+                False: parameters of the layer are frozed
+                True: parameters are updated during optimizer step
         '''
         assert isinstance(outChannels, int) and outChannels > 0
         assert isinstance(inChannels, int) and inChannels > 0
@@ -64,11 +51,11 @@ class Conv2D(Layer):
         Convolves Inputs with the Weights
 
         Args:
-            :X (numpy.ndarray): Input array
-            :train (bool): Set true to cache X and X_col
+            X (numpy.ndarray): Input array
+            train (bool): Set true to cache X and X_col
 
         Returns:
-            :Out (numpy.ndarray): Output after Convolution
+            Out (numpy.ndarray): Output after Convolution
         '''
         output, X_col = self._convolve_(
             Input=X, kernel=self.W, bias=self.b,
@@ -83,17 +70,16 @@ class Conv2D(Layer):
         Performs a backward pass through the Conv2D Layer
 
         Args:
-            :dY (numpy.ndarray): Output gradient backpropagated from layers in the front
+            dY (numpy.ndarray): Output gradient backpropagated from layers
 
         Returns:
-            :dX (numpy.ndarray): Input gradient after backpropagating dY through Conv2D
-            :var_grad_list (list):
-                :trainable = True: [(W,dW), (b,db)]
-                :trainable = False: [ ]
+            dX (numpy.ndarray): Input gradient after backprop dY through Conv2D
+            var_grad_list (list):
+                trainable = True [(W,dW), (b,db)]
+                trainable = False [ ]
         '''
         if self.cache_in is None:
-            raise RuntimeError(
-                'Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
+            raise RuntimeError('Gradient cache not defined')
         X, X_col = self.cache_in
         n_filter, d_filter, h_filter, w_filter = self.W.shape
 
@@ -119,7 +105,10 @@ class Conv2D(Layer):
             return dX, []
 
     def __repr__(self):
-        return f'Conv2D Layer with {self.W.shape[0]} number of filters of shape {self.W.Shape[1:]}, Stide = {self.stride}, padding = {self.padding} Trainable = {self.trainable}'
+        return (f'Conv2D Layer with {self.W.shape[0]}'
+                f' number of filters of shape {self.W.Shape[1:]},'
+                f' Stide = {self.stride}, padding = {self.padding}'
+                f' Trainable = {self.trainable}')
 
     @staticmethod
     def _convolve_(Input, kernel, bias=0, padding=0, stride=1):
@@ -128,15 +117,15 @@ class Conv2D(Layer):
         Convolves Inputs with the given kernel
 
         Args:
-            Input (numpy.ndarray)     :    Input to be Convolved over
-            kernel (numpy.ndarray)    :    Kernel to be Convoled with
-            bias (numpy.ndarray)      :    bias optional, set to zero unless needed
-            padding (int)             :    padding to be used
-            stride (int)              :    stride to used
+            Input (numpy.ndarray): Input to be Convolved over
+            kernel (numpy.ndarray): Kernel to be Convoled with
+            bias (numpy.ndarray): bias optional, set to zero unless needed
+            padding (int): padding to be used
+            stride (int): stride to used
 
         Returns:
-            out (numpy.ndarray)       :    Output after convolution
-            Input_col (numpy.ndarray) :    retiled and stacked input
+            out (numpy.ndarray): Output after convolution
+            Input_col (numpy.ndarray): retiled and stacked input
         '''
         assert len(Input.shape) == 4 and len(kernel.shape) == 4
         n_x, d_x, h_x, w_x = Input.shape
@@ -152,7 +141,9 @@ class Conv2D(Layer):
 
         h_out, w_out = int(h_out), int(w_out)
 
-        Input_col = im2col.im2col_indices(Input, h_filter, w_filter, padding=padding, stride=stride)
+        Input_col = im2col.im2col_indices(Input, h_filter,
+                                          w_filter, padding=padding,
+                                          stride=stride)
         kernel_row = kernel.reshape(n_filter, -1)
         out = kernel_row @ Input_col + bias
         out = out.reshape(n_filter, h_out, w_out, n_x)
@@ -166,8 +157,7 @@ class Conv2D(Layer):
         outChannels, inChannels, filter_size, _ = self.W.shape
         config = {"outChannels": outChannels, "inChannels": inChannels,
                   "stride": self.stride, "padding": self.padding,
-                  "filter_size": filter_size, "trainable": self.trainable,
-                  "trainable": self.trainable}
+                  "filter_size": filter_size, "trainable": self.trainable}
         base_config = super(Conv2D, self)._get_config_()
         return dict(list(base_config.items())+list(config.items()))
 
@@ -175,47 +165,36 @@ class Conv2D(Layer):
 class dilated_Conv2D(Conv2D):
     '''
     2D Dilated Convolutional Layer
-
-    Initialization:
-        :W: initialized with either Xavier or He initialization
-        :b: initialized to zero
-        :dm: dilation matrix that is used to dilated the kernels
-
-    Args:
-        :outChannels (int):   Number of output channels
-        :inChannels (int):   size of output requred
-        :filter_size (int):   Size of each kernel (filter_size x filter_size)
-        :dilation (int):   Dilation factor to be used
-        :stride (int):   Stride to be used
-        :padding (int):   Padding to be used for convolution
-        :init_method (str):   initialization method to be used for Weights
-        :trainable (bool):
-            :False: parameters of the layer are frozed
-            :True: parameters are updated during optimizer step
     '''
 
-    def __init__(self, outChannels, inChannels, filter_size, dilation=2, stride=1, padding=0, *, init_method='Xavier', trainable=False):
+    def __init__(self, outChannels, inChannels, filter_size, dilation=2,
+                 stride=1, padding=0, *, init_method='Xavier',
+                 trainable=False):
         '''
         Initializes the Convolutional layer
             W is initialized with either Xavier or He initialization
             b is initialized to zero
-            dm generates the dilation matrix that is used to dilated the kernels
+            dm generates the dilation matrix that is used for dilations
 
         Args:
-            outChannels (int)   :   Number of output channels
-            inChannels (int)    :   size of output requred
-            filter_size (int)   :   Size of each kernel (filter_size x filter_size)
-            dilation (int)      :   Dilation factor to be used
-            stride (int)        :   Stride to be used
-            padding (int)       :   Padding to be used for convolution
-            init_method (str)   :   initialization method to be used for Weights
-            trainable (bool)    :   if set to False parameters of the layer are frozed
-                                    if set to True parameters are updated during optimizer step
+            outChannels (int): Number of output channels
+            inChannels (int): size of output requred
+            filter_size (int): Size of each kernel (filter_size x filter_size)
+            dilation (int): Dilation factor to be used
+            stride (int): Stride to be used
+            padding (int): Padding to be used for convolution
+            init_method (str): initialization method to be used for Weights
+            trainable (bool): False -> the layer are frozen
+                              True -> updated during optimizer step
         '''
-        super(dilated_Conv2D, self).__init__(outChannels=outChannels, inChannels=inChannels,
-                                             filter_size=filter_size, stride=stride, padding=padding, trainable=trainable, init_method=init_method)
+        super(dilated_Conv2D, self).__init__(
+            outChannels=outChannels, inChannels=inChannels,
+            filter_size=filter_size, stride=stride, padding=padding,
+            trainable=trainable, init_method=init_method
+        )
         assert isinstance(dilation, int) and dilation > 0
-        self.dilation = dilation  # currently supports only symmetical dilations
+        # currently supports only symmetical dilations
+        self.dilation = dilation
         self.dm = self._create_dilation_mat_()
         self.l_name = 'dilated_Conv2D'
 
@@ -225,11 +204,11 @@ class dilated_Conv2D(Conv2D):
         Convolves Inputs with the kernels after dilation
 
         Args:
-            :X (numpy.ndarray):   Input array
-            :train (bool):   Set true to cache X and X_col
+            X (numpy.ndarray): Input array
+            train (bool): Set true to cache X and X_col
 
         Returns:
-            :Output (numpy.ndarray):   Output after Convolution
+            Output (numpy.ndarray): Output after Convolution
         '''
         # dilate the kernels using dilation matrix
         self.W_exp = self.dm@self.W@self.dm.T
@@ -244,17 +223,19 @@ class dilated_Conv2D(Conv2D):
         Performs a backward pass through the dilated Conv2D Layer
 
         Args:
-            :dY (numpy.ndarray): Output gradient backpropagated from layers in the front
+            dY (numpy.ndarray): Output gradient backpropagated
 
         Returns:
-            :dX (numpy.ndarray): Input gradient after backpropagating dY through dilated Conv2D
-            :var_grad_list (list):
+            dX (numpy.ndarray): Input grad after backprop
+            var_grad_list (list):
                 :trainable = True: [(W,dW), (b,db)]
                 :trainable = False: [ ]
         '''
         if self.cache_in is None:
             raise RuntimeError(
-                'Gradient cache not defined. When training the train argument must be set to true in the forward pass.')
+                f'Gradient cache not defined. When training '
+                f'the train argument must be set to true in the forward pass.'
+            )
         X = self.cache_in
 
         n_filter, d_filter, h_filter, w_filter = self.W.shape
@@ -268,10 +249,10 @@ class dilated_Conv2D(Conv2D):
         assert X.shape == dX.shape
 
         if self.trainable:
-
             db = np.sum(dY, axis=(0, 2, 3)).reshape(n_filter, -1)
-            dW, _ = self._convolve_(Input=X.transpose(1, 0, 2, 3), kernel=dY.transpose(
-                1, 0, 2, 3), stride=self.dilation, padding=0)
+            dW, _ = self._convolve_(Input=X.transpose(1, 0, 2, 3),
+                                    kernel=dY.transpose(1, 0, 2, 3),
+                                    stride=self.dilation, padding=0)
             dW = dW.transpose(1, 0, 2, 3)
 
             assert self.W.shape == dW.shape
@@ -286,13 +267,13 @@ class dilated_Conv2D(Conv2D):
         generates a dilation matrix that is used to dilate the kernel
 
         Returns:
-            dilation_mat (numpy.ndarray) : Matrix that is used to dilate the kernel
+            dilation_mat (np.ndarray) : Matrix that is used for dilation
         '''
-        I = np.eye(self.W.shape[2])
+        I_ = np.eye(self.W.shape[2])
         z = np.zeros((1, self.W.shape[2]))
         res = []
         for i in range(self.W.shape[2]):
-            res.append(I[i])
+            res.append(I_[i])
             for k in range(self.dilation-1):
                 res.append(z)
         res = np.row_stack(res)
@@ -309,4 +290,7 @@ class dilated_Conv2D(Conv2D):
         return dict(list(base_config.items())+list(config.items()))
 
         def __repr__(self):
-            return f'Conv2D Layer with {self.W.shape[0]} dilation = {dilation} number of filters of shape {self.W.Shape[1:]}, Stide = {self.stride}, padding = {self.padding} Trainable = {self.trainable}'
+            return (f'Conv2D Layer with {self.W.shape[0]} '
+                    f'dilation = {self.dilation} number of filters of '
+                    f'shape {self.W.Shape[1:]}, Stide = {self.stride}, '
+                    f'padding = {self.padding} Trainable = {self.trainable}')
