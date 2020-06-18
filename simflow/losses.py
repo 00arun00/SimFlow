@@ -3,9 +3,10 @@ from abc import ABC, abstractmethod
 
 
 class Loss(ABC):
-    '''
+    """
     Abstract class representing a loss function
-    '''
+    """
+
     @abstractmethod
     def get_loss(self, scores, labels):
         """
@@ -14,12 +15,12 @@ class Loss(ABC):
 
 
 class SoftmaxCrossEntropyLoss(Loss):
-    '''
+    """
     Represents the categorical softmax cross entropy loss
-    '''
+    """
 
     def get_loss(self, scores, labels):
-        '''
+        """
         Calculates the average categorical softmax cross entropy loss.
 
         Args:
@@ -28,7 +29,7 @@ class SoftmaxCrossEntropyLoss(Loss):
         Returns:
             loss (float): The average cross entropy
             grad (numpy.ndarray): Gradient for scores w.r.t the loss.
-        '''
+        """
         scores_norm = scores - np.max(scores, axis=1, keepdims=True)
         scores_norm = np.exp(scores_norm)
         scores_norm = scores_norm / np.sum(scores_norm, axis=1, keepdims=True)

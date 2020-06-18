@@ -17,7 +17,7 @@ def numerical_gradient_array(f, x, df, h=1e-5):
         grad (numpy.ndarray): computed numeric gradient
     """
     grad = np.zeros_like(x)
-    it = np.nditer(x, flags=['multi_index'], op_flags=['readwrite'])
+    it = np.nditer(x, flags=["multi_index"], op_flags=["readwrite"])
     while not it.finished:
         ix = it.multi_index
         oldval = x[ix]
